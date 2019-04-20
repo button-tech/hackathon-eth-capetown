@@ -8,7 +8,18 @@ const user = {
         nickname: nickname,
         ethereumAddress: ethereumAddress,
         bitcoinAddress: bitcoinAddress
-    }, (err, doc) => {})
+    }, (err, doc) => {}),
+    find: {
+        all: () => {
+            return new Promise((resolve, reject) => {
+                User.find({}, (err, doc) => {
+                    if (err)
+                        reject(err);
+                    resolve(doc[0]);
+                });
+            });
+        },
+
     }
 };
 
