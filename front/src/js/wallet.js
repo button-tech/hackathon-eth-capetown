@@ -8,6 +8,7 @@ const toWei = web3.utils.toWei;
 // Only for hackathon need to be (await web3.eth.getBlock("latest")) + 5760;
 const blockLimit = 9999999;
 
+const toHexWeiString = (amount) => "0x"+(amount*10**18).toString(16)
 
 class Wallet {
 
@@ -19,29 +20,30 @@ class Wallet {
     // return: new contract address
     async deployWallet(privateKey) {
         // const nextNonce = Number(await web3.eth.getTransactionCount(getAddress(privateKey))) + 1;
-        const signedData = await signTransaction(privateKey, null, 0, bytecode, [3 * 10 ** 6]);
+        const signedData = await signTransaction(privateKey, null, null, [bytecode], [3 * 10 ** 6]);
         return sendSigned(signedData, true);
     }
 
     // return: transaction hash
     async depositEthToWallet(privateKey, amount) {
-        const signedData = await signTransaction(privateKey, this.walletAddress, Number(toWei(amount.toString())));
+        const signedData = await signTransaction(privateKey, this.walletAddress, toHexWeiString(amount), "",[1 * 10 ** 6]);
         return sendSigned(signedData);
     }
 
     async depositTokenToWallet(privateKey, tokenAddress, amount) {
-        return sendToken(tokenAddress, privateKey, this.walletAddress, toUIntStr(Number(toWei(amount.toString()))));
+        return sendToken(tokenAddress, privateKey, this.walletAddress, toHexWeiString(amount));
     }
 
     async transferEthFromWallet(privateKey, to, amount) {
-        amount = Number(toWei(amount.toString()));
-        return set(this.wallet, "exec", privateKey, 0, [to, toUIntStr(Number(toWei(amount.toString()))), toUIntStr(Number(toWei("0"))), "0x"]);
+        amount = toHexWeiString(amount);
+        return set(this.wallet, "exec", privateKey, 0, [to, amount, "0", "0x"]);
     }
 
     async transferTokenFromWallet(privateKey, tokenAddress, to, amount) {
-        const instance = getInstance(ABI, tokenAddress);
-        const data = getCallData(instance, "transfer", [to, toUIntStr(Number(toWei(amount.toString())))]);
-        return set(this.wallet, "exec", privateKey, 0, [to, "0", "0", data]);
+        amount = toHexWeiString(amount);
+        const instance = getInstance(test_token, tokenAddress);
+        const data = getCallData(instance, "transfer", [to, amount]);
+        return set(this.wallet, "exec", privateKey, null, [tokenAddress, toWei("0"), toWei("0"), data]);
     }
 
     // return: transaction hash

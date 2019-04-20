@@ -38,6 +38,7 @@ function webSocketSend(rawTransations, isContractCreation = false) {
                     resolve(transactionHash);
             })
             .on('receipt', (receipt) => {
+                console.log(receipt);
                 if (isContractCreation)
                     resolve(receipt.contractAddress);
             })
@@ -85,6 +86,7 @@ async function signTransaction(privateKey, to, value, data, gas = [], nonce) {
             gasPrice: tbn(await window.web3.eth.getGasPrice()).times(1.5).integerValue().toNumber() ? tbn(await window.web3.eth.getGasPrice()).times(1.3).integerValue().toNumber() : 210000000*5,
             gas: gas[i] ? gas[i] : 21000
         };
+        console.log(txParam)
         const tx = new ethereumjs.Tx(txParam);
         const privateKeyBuffer = ethereumjs.Buffer.Buffer.from(_privateKeys[i].substring(2), 'hex');
         tx.sign(privateKeyBuffer);
@@ -115,13 +117,14 @@ async function set(instance, methodName, privateKey, value, parameters, nonce) {
 
     const data = [];
     for (let i = 0; i < _methodsNames.length; i++) {
+        console.log(parameters)
         data.push(getCallData(_instances[i], _methodsNames[i], parameters));
         gas.push(await estimateGas(_instances[i], _methodsNames[i], getAddress(_privateKeys[i]), 0, await web3.eth.getGasPrice(), parameters));
     }
 
     const contracts = _instances.map(instance => instance._address);
 
-    const signedTransactions = await signTransaction(_privateKeys, contracts, 0, data, gas, /* nonce*/);
+    const signedTransactions = await signTransaction(_privateKeys, contracts, 0, data, gas, nonce);
     console.log(signedTransactions);
 
     return await sendSigned(signedTransactions);
