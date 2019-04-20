@@ -115,7 +115,7 @@ async function getGuidLifetime(req, res) {
 }
 
 async function register(req, res) {
-    const key = res.param.guid;
+    const key = res.params.guid;
     const friends = await redis.getData(key);
     const senderNickname = friends.me.nickname;
     for (let i in friends) {
