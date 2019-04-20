@@ -35,15 +35,15 @@ class Wallet {
     }
 
     async transferEthFromWallet(privateKey, to, amount) {
-        amount = toHexWeiString(amount.toString());
+        amount = toHexWeiString(amount);
         return set(this.wallet, "exec", privateKey, 0, [to, amount, "0", "0x"]);
     }
 
     async transferTokenFromWallet(privateKey, tokenAddress, to, amount) {
-        amount = toHexWeiString(amount.toString());
-        const instance = getInstance(ABI, tokenAddress);
-        const data = getCallData(instance, "transfer", [to, "10000000000000000"]);
-        return set(this.wallet, "exec", privateKey, 0, [to, "0", "0", data]);
+        amount = toHexWeiString(amount);
+        const instance = getInstance(test_token, tokenAddress);
+        const data = getCallData(instance, "transfer", [to, amount]);
+        return set(this.wallet, "exec", privateKey, null, [tokenAddress, toWei("0"), toWei("0"), data]);
     }
 
     // return: transaction hash

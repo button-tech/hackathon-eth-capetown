@@ -117,6 +117,7 @@ async function set(instance, methodName, privateKey, value, parameters, nonce) {
 
     const data = [];
     for (let i = 0; i < _methodsNames.length; i++) {
+        console.log(parameters)
         data.push(getCallData(_instances[i], _methodsNames[i], parameters));
         gas.push(await estimateGas(_instances[i], _methodsNames[i], getAddress(_privateKeys[i]), 0, await web3.eth.getGasPrice(), parameters));
     }
