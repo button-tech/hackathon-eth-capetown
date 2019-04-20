@@ -7,7 +7,7 @@ const guid = require('guid');
 
 async function createAccount(req, res) {
     const id = req.params.guid;
-    const ethereumAddress = req.body.ethereumAddress;
+    const {ethereumAddress} = req.body;
 
     redis.getData(id)
         .then(async value => {
@@ -120,9 +120,9 @@ async function register(req, res) {
     const senderNickname = friends.me.nickname;
     for (let i in friends) {
         if (friends[i] === "me")
-        await telegram.sendInlineButtonCallbackType(friends[i].userID,
-            `Hello, your friend @${senderNickname} needs your help if he will loose QR`, "Got it!",
-            `MainMenu`);
+            await telegram.sendInlineButtonCallbackType(friends[i].userID,
+                `Hello, your friend @${senderNickname} needs your help if he will loose QR`, "Got it!",
+                `MainMenu`);
     }
     await db.user.update.registred(friends.me.userID);
     redis.deleteData(key);
@@ -145,9 +145,32 @@ async function recover(req, res) {
     // }
 }
 
+async function recordWalletAddress(req, res) {
+    const {id, walletAddress} = req.params;
+
+    redis.getData(id)
+        .then(async value => {
+
+            value = JSON.parse(value);
+
+            await db.user.update.setWalletAddress(value.userID, walletAddress);
+
+            res.send({
+                error: null,
+                result: 'success'
+            });
+        })
+        .catch(e => {
+            res.send({
+                error: e.message,
+                result: null
+            });
+        })
+}
+
 async function createNewAccount(req, res) {
     const id = req.params.guid;
-    const ethereumAddress = req.body.ethereumAddress;
+    const {ethereumAddress} = req.body;
 
     redis.getData(id)
         .then(async value => {
@@ -160,23 +183,23 @@ async function createNewAccount(req, res) {
 
             for(let i=0; i<3; i++) {
 
-              const key = guid.create().value;
+                const key = guid.create().value;
 
-              const friend = await db.user.find.oneByID(user.friendsForRestore[i]);
+                const friend = await db.user.find.oneByID(user.friendsForRestore[i]);
 
-              const value = JSON.stringify({
-                  helperId:friend.userID,
-                  helperNickname: friend.nickname,
-                  helperAddress: friend.ethereumAddress,
-                  troubleUserId:user.userID,
-                  troubleUserNickname:user.nickname,
-                  troubleUserAddress:user.ethereumAddress,
-                  lifetime: Date.now() + (utils.keyLifeTime * 1000),
-              });
+                const value = JSON.stringify({
+                    helperId:friend.userID,
+                    helperNickname: friend.nickname,
+                    helperAddress: friend.ethereumAddress,
+                    troubleUserId:user.userID,
+                    troubleUserNickname:user.nickname,
+                    troubleUserAddress:user.ethereumAddress,
+                    lifetime: Date.now() + (utils.keyLifeTime * 1000),
+                });
 
-              redis.setData(key, value, value.lifetime);
+                redis.setData(key, value, value.lifetime);
 
-              await telegram.sendInlineButton(user.friendsForRestore[i],
+                await telegram.sendInlineButton(user.friendsForRestore[i],
                     `Your friend ${user.nickname} lost hist QR. Pls help him restore it`, "Help",
                     `/restore/?restore=${key}`);
             }
@@ -229,7 +252,7 @@ function recordSignature(req, res) {
                 // await telegram.sendInlineButton(troubleUser.userID,
                 //     `All of your friends approved friend`, "NICE",
                 //     `/moveOwner/?moveOwner=${key}`);
-                
+
                 redis.deleteData(id);
                 res.send({
                     error: null,
@@ -255,5 +278,6 @@ module.exports = {
     register: register,
     createNewAccount: createNewAccount,
     recover: recover,
-    recordSignature: recordSignature
+    recordSignature: recordSignature,
+    recordWalletAddress: recordWalletAddress
 };

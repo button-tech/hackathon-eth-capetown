@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
 require('dotenv').config();
 const handlers = require('./handlers/handlers1');
 
@@ -12,6 +11,8 @@ app.use(bodyParser.urlencoded({limit: '20mb', extended: true}));
 
 app.put('/api/create/:guid',  handlers.createAccount);
 app.put('/api/transaction/:guid', handlers.createTransaction);
+
+app.post('/api/walletAddress/:walletAddress/:guid', handlers.recordWalletAddress);
 
 // Колбек, когда нужно пересоздать аккаунт после потерянного ключа
 app.put('/api/recovery/create/:guid', handlers.createNewAccount);

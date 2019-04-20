@@ -87,11 +87,20 @@ async function sendDeployTransaction() {
     const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
     console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
     await sendWalletAddressToServer(walletAddress);
+    await notifyFriends(); app.put('/api/recovery/register/:guid', handlers.register);
 
     closeLoader();
 
     alert(`Your SRW wallet contract located at: ${walletAddress}`);
 }
+
+
+async function notifyFriends(currency, network, txHash) {
+    const guid = getShortlink();
+    const url = `${backendURL}/recovery/register/${guid}`;
+    return await query('PUT', url);
+}
+
 
 /**
  * Allows to print url with transaction hash of chosen blockchain explorer
