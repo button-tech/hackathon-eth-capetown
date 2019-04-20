@@ -2,8 +2,9 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const handlers = require('./handlers/handlers1');
+
 require('dotenv').config();
+const handlers = require('./handlers/handlers1');
 
 app.use(cors());
 app.use(bodyParser.json({limit: '20mb'}));

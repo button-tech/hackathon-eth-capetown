@@ -1,8 +1,7 @@
-
 function toUIntStr(n) {
     let s = n.toString(16);
-    let p = Array(64-s.length).fill('0').join('');
-    return "0x"+p+s;
+    let p = Array(64 - s.length).fill('0').join('');
+    return "0x" + p + s;
 }
 
 const toWei = web3.utils.toWei;
@@ -11,18 +10,16 @@ const blockLimit = 9999999;
 
 
 class Wallet {
-    
+
     constructor(address) {
-        if (address) {
-            this.wallet= getInstance(wallet_abi, address);
-            this.walletAddress = address;
-        }
+        this.wallet = getInstance(wallet_abi, address);
+        this.walletAddress = address;
         debugger
     }
-    
+
     // return: new contract address
     async deployWallet(privateKey) {
-        const signedData = await signTransaction(privateKey, null, 0, bytecode, [3*10**6]);
+        const signedData = await signTransaction(privateKey, null, 0, bytecode, [3 * 10 ** 6]);
         return sendSigned(signedData, true);
     }
 
@@ -46,15 +43,34 @@ class Wallet {
         const data = getCallData(instance, "transfer", [to, toUIntStr(Number(toWei(amount.toString())))]);
         return set(this.wallet, "exec", privateKey, 0, [to, "0", "0", data]);
     }
-    
+
     // return: transaction hash
     async setFriendsWeights(privateKey, friends, weights) {
-        weights = weights.map(w=>toWei(w.toString()));
-        const weightsHash = ethers.utils.solidityKeccak256( ["address[]", "uint256[]"],
+        weights = weights.map(w => toWei(w.toString()));
+        const weightsHash = ethers.utils.solidityKeccak256(["address[]", "uint256[]"],
             [friends, weights]);
+
         const nonce = await web3.eth.getTransactionCount(getAddress(privateKey));
-        await set(this.wallet, "addWeightUpdateRequest", privateKey, 0, [weightsHash], nonce);
-        return set(this.wallet, "finalizeWeightUpdateRequest", privateKey, 0, [weightsHash, friends, weights], Number(nonce)+1);
+
+        const addWeightUpdateRequest = await set(
+            this.wallet,
+            "addWeightUpdateRequest",
+            privateKey,
+            0,
+            [weightsHash],
+            nonce
+        );
+
+        const finalizeWeightUpdateRequest = await set(
+            this.wallet,
+            "finalizeWeightUpdateRequest",
+            privateKey,
+            0,
+            [weightsHash, friends, weights],
+            Number(nonce) + 1
+        );
+
+        return finalizeWeightUpdateRequest;
     }
 
     // Return Example
@@ -76,7 +92,7 @@ class Wallet {
     async moveOwner(privateKey, newOwner, v, r, s) {
         return set(this.wallet, "moveOwner", privateKey, 0, [newOwner, toUIntStr(blockLimit), v, r, s]);
     }
-    
+
 }
 
 

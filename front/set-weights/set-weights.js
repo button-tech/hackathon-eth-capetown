@@ -53,44 +53,38 @@ async function getLinkLivetime() {
  * Allows to sign and send transaction into Blockchain
  * @returns {Promise<void>}
  */
-async function sendTransaction() {
-    try {
-        openLoader();
-        await loadImage();
-        const qrData = await decodeQR();
-        const password = getPassword();
-        const decryptedData = JSON.parse(decryptData(qrData, password));
+async function sendDeployTransaction() {
 
-        const transactionData = await getTransactionData();
-        let {
-            currency,
-            toAddress,
-            amount,
-        } = transactionData;
+    openLoader();
+    await loadImage();
+    const qrData = await decodeQR();
+    const password = getPassword();
+    const decryptedData = JSON.parse(decryptData(qrData, password));
+    const mySecretKey = decryptedData.Ethereum;
+    const myPublicKey = window.friends.me.address;
 
-        let transactionHash;
 
-        if (currency == 'Ethereum') {
-            amount = tw(amount).toNumber();
-            let rawTx = (await BL.signTransaction(decryptedData[currency], toAddress, amount));
-            transactionHash = await BL.sendSigned(rawTx);
-        } else {
-            amount = tw(amount).toNumber();
-            const instance = getInstance(ABI, ADDRESSES[currency]);
-            transactionHash = (await BL.set(instance, 'transfer', decryptedData["Ethereum"], 0, [toAddress, "0x" + Number(amount).toString(16)]));
-            currency = "Ethereum";
-        }
+    const friendAddresses = [
+        window.friends.friend1.address,
+        window.friends.friend2.address,
+        window.friends.friend3.address
+    ];
 
-        console.log(transactionHash);
+    debugger;
 
-        setTransactionURL(currency, 'testnet', transactionHash);
+    const wallet = new Wallet(myPublicKey);
+    const deployTxHash = await wallet.deployWallet(mySecretKey);
+    console.log(deployTxHash);
+    debugger;
 
-        await sendTransactionDataToServer(transactionHash);
+    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
+    console.log(depositEthTxHash);
+    debugger;
 
-        closeLoader();
-    } catch (e) {
-        addHint(e.message);
-    }
+    const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, [1, 1, 1]);
+    debugger;
+
+    closeLoader();
 }
 
 /**
@@ -206,6 +200,9 @@ function loadImage() {
         me
     } = transactionData;
 
+    window.friends = transactionData;
+
+
     document.getElementById('friend1').innerText = friend1.address;
     document.getElementById('friendNick1').innerText = friend1.nickname;
     document.getElementById('friend2').innerText = friend2.address;
@@ -268,11 +265,6 @@ function getShortlink() {
     });
 
     return urlData.guid;
-}
-
-function deployWallet() {
-    const w = new Wallet();
-    // const x = "123";
 }
 
 /**

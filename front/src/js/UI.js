@@ -36,9 +36,7 @@ function openLoader() {
 
 function closeLoader() {
     const elem = document.getElementById('loader');
-    if (elem){
-        elem.style.display = 'none';
-    }
+    elem.style.display = 'none';
 }
 
 function addError(errorText) {
