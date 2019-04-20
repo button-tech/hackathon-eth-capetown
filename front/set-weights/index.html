@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: "Roboto", sans-serif !important;
+        }
+
+        .slidecontainer {
+            width: 100%; /* Width of the outside container */
+        }
+
+        /* The slider itself */
+        .slider {
+            -webkit-appearance: none; /* Override default CSS styles */
+            appearance: none;
+            width: 100%; /* Full-width */
+            height: 25px; /* Specified height */
+            background: #d3d3d3; /* Grey background */
+            outline: none; /* Remove outline */
+            opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+            -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+            transition: opacity .2s;
+        }
+
+        /* Mouse-over effects */
+        .slider:hover {
+            opacity: 1; /* Fully shown on mouse-over */
+        }
+
+        /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none; /* Override default look */
+            appearance: none;
+            width: 25px; /* Set a specific slider handle width */
+            height: 25px; /* Slider handle height */
+            background: #000000; /* Green background */
+            cursor: pointer; /* Cursor on hover */
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px; /* Set a specific slider handle width */
+            height: 25px; /* Slider handle height */
+            background: #000000; /* Green background */
+            cursor: pointer; /* Cursor on hover */
+        }</style>
+    <title>ZAEbumba</title>
+</head>
+<body>
+<br>
+<br> <br>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h3>Pick weight for friend @nickname1</h3>
+            <br>
+            <br>
+            <div class="slidecontainer">
+                <h4 class="text-center" id="range1">Range is 50</h4>
+                <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+            </div>
+            <br>
+            <br>
+            <h3>Pick weight for friend @nickname2</h3>
+            <br>
+            <br>
+            <div class="slidecontainer">
+                <h4 class="text-center" id="range2">Range is 50</h4>
+                <input type="range" min="1" max="100" value="50" class="slider" id="myRange2">
+            </div>
+            <br>
+            <br>
+            <h3>Pick weight for friend @nickname1</h3>
+            <br>
+            <br>
+            <div class="slidecontainer">
+                <h4 class="text-center" id="range3">Range is 50</h4>
+                <input type="range" min="1" max="100" value="50" class="slider" id="myRange3">
+            </div>
+            <br>
+            <button class="btn btn-danger btn-lg text-center"> Apply</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<script>
+    $('#myRange').on('input', function () {
+        $('#range1').text("Range is: " + ($('#myRange').val()));
+    })
+    $('#myRange2').on('input', function () {
+        $('#range2').text("Range is: " + ($('#myRange2').val()));
+    })
+    $('#myRange3').on('input', function () {
+        $('#range3').text("Range is: " + ($('#myRange3').val()));
+    })
+</script>
+</body>
+</html>

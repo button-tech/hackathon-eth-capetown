@@ -1,4 +1,4 @@
-const backendURL = 'http://localhost:3000';
+const backendURL = 'https://capetown.buttonwallet.com/api';
 
 const explorers = {
     "Ethereum": {
