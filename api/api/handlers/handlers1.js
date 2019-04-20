@@ -155,8 +155,6 @@ async function recordWalletAddress(req, res) {
 
             await db.user.update.setWalletAddress(value.userID, walletAddress);
 
-            redis.deleteData(id);
-
             res.send({
                 error: null,
                 result: 'success'
