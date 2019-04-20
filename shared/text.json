@@ -25,21 +25,21 @@
       "text": "Here you can create account",
       "0": {
         "button": "🔐 Create wallet",
-        "callback": "http://127.0.0.1/create/?create="
+        "callback": "/create/?create="
       }
     },
     "send_transaction": {
       "text": "Tap the button to sign and send transaction",
       "0": {
         "button": "🖋 Send money",
-        "callback": "http://127.0.0.1/send/?tx="
+        "callback": "/send/?tx="
       }
     },
     "save_money": {
       "text": "Open this link in browser to create social recovery wallet (SRW). Set weights from 1 to 10 for friends",
       "0": {
         "button": "Create SRW",
-        "callback": "http://127.0.0.1/set-weights/?guid="
+        "callback": "/set-weights/?guid="
       },
       "1": {
         "button": "Select other friends",

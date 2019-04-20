@@ -27,7 +27,7 @@ module.exports = {
 
         async function start(ctx) {
             const me = await db.user.find.oneByID(ctx.message ? ctx.message.from.id : ctx.update.callback_query.from.id);
-            debugger
+            // debugger
             if (me.friendsForRestore.length !== 0) {
                 PageConstructor.setCallbackButtonPageCallback(Text.inline_keyboard.save_money["1"].callback, "ReElectFriends", ctx.scene);
                 ctx.reply(Text.dialog.createBackup["0"], Extra.markup(Keyboard.selectOtherFriends));
