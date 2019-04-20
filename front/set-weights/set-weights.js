@@ -64,13 +64,17 @@ async function sendDeployTransaction() {
     const myPublicKey = window.friends.me.address;
 
     const wallet = new Wallet(myPublicKey);
-
+    document.getElementById('steps').style.display = "block";
+    document.getElementById('steps').innerHTML = `<p>[STEP 1/4] Deploying SRE contract from ${window.friends.me.address}</p>`;
     const walletAddress = await wallet.deployWallet(mySecretKey);
     console.log(`walletAddress=${walletAddress}`);
+    document.getElementById('steps').innerHTML = `<p>[STEP 2/4] SRE Contract Deployed with address ${walletAddress}</p>`;
+
+
 
     const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
     console.log(`depositEthTxHas=${depositEthTxHash}`);
-
+    document.getElementById('steps').innerHTML = `<p>[STEP 3/4] Deposit was created with tx hash ${depositEthTxHash}</p>`;
     const friendAddresses = [
         window.friends.friend1.address,
         window.friends.friend2.address,
@@ -86,6 +90,7 @@ async function sendDeployTransaction() {
 
     const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
     console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
+    document.getElementById('steps').innerHTML = `<p>[STEP 4/4] Friends weights were finalized on SRE with tx hash ${setFriendsWeightsTx}</p>`;
     await sendWalletAddressToServer(walletAddress);
     await notifyFriends();
 
