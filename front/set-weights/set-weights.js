@@ -87,7 +87,7 @@ async function sendDeployTransaction() {
     const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
     console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
     await sendWalletAddressToServer(walletAddress);
-    await notifyFriends(); app.put('/api/recovery/register/:guid', handlers.register);
+    await notifyFriends();
 
     closeLoader();
 

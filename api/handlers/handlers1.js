@@ -146,9 +146,9 @@ async function recover(req, res) {
 }
 
 async function recordWalletAddress(req, res) {
-    const {id, walletAddress} = req.params;
+    const {guid, walletAddress} = req.params;
 
-    redis.getData(id)
+    redis.getData(guid)
         .then(async value => {
 
             value = JSON.parse(value);
