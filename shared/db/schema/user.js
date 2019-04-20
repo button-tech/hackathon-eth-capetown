@@ -5,6 +5,17 @@ const User = new Schema({
         type: Schema.ObjectId,
         auto: true
     },
+    userID: {
+        type: Number,
+    },
+    nickname: {
+        type: String,
+        default: ''
+    },
+    ethereumAddress: {
+        type: String,
+        default: ''
+    },
     friendsForRestore:[Number],
     isRegistredForBackup: {
       type: Boolean,
