@@ -84,9 +84,9 @@ const user = {
                 });
             });
         },
-        setRecoveryAddress : async (userID, recoveryAddress)=>{
+        setRecoveryAddress : async (userID, recoveryAddress, walletAddress)=>{
             return new Promise((resolve, reject) => {
-                User.updateOne({userID: userID}, {recoveryAddress: recoveryAddress}, (err, doc) => {
+                User.updateOne({userID: userID}, {recoveryAddress: recoveryAddress, walletAddress: walletAddress}, (err, doc) => {
                     if (err)
                         reject(err);
                     resolve(doc);

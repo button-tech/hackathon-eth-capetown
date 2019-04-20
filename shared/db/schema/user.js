@@ -25,6 +25,7 @@ const User = new Schema({
         type: String,
         default: ''
     },
+    walletAddress: String,
     tmpAddress: {
         type: String,
         default: ''
