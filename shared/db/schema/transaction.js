@@ -31,7 +31,7 @@ const Transaction = new Schema({
         default: Date.now()
     }
 }, {
-    versionKey: false
+
 });
 
 //v 2.0
