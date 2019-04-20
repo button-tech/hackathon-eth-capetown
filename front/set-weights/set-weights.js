@@ -66,11 +66,10 @@ async function sendDeployTransaction() {
     const wallet = new Wallet(myPublicKey);
 
     const walletAddress = await wallet.deployWallet(mySecretKey);
-    console.log(walletAddress);
+    console.log(`walletAddress=${walletAddress}`);
 
     const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
-    console.log(depositEthTxHash);
-
+    console.log(`depositEthTxHas=${depositEthTxHash}`);
 
     const friendAddresses = [
         window.friends.friend1.address,
@@ -78,7 +77,15 @@ async function sendDeployTransaction() {
         window.friends.friend3.address
     ];
 
-    const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, [1, 1, 1]);
+    //
+    const weights = [
+        window.friendWeight1,
+        window.friendWeight2,
+        window.friendWeight3
+    ];
+
+    const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
+    console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
 
     alert(`Your SRW wallet contract located at: ${walletAddress}`);
 
@@ -204,8 +211,10 @@ function loadImage() {
 
     document.getElementById('friend1').innerText = friend1.address;
     document.getElementById('friendNick1').innerText = friend1.nickname;
+
     document.getElementById('friend2').innerText = friend2.address;
     document.getElementById('friendNick2').innerText = friend2.nickname;
+
     document.getElementById('friend3').innerText = friend3.address;
     document.getElementById('friendNick3').innerText = friend3.nickname;
     // document.getElementById('value').innerText = amount;

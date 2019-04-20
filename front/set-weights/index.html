@@ -164,23 +164,23 @@
 </script>
 <script>
 
-    let friendWeight1;
-    let friendWeight2;
-    let friendWeight3;
+    // let friendWeight1;
+    // let friendWeight2;
+    // let friendWeight3;
 
     $('#myRange').on('input', function () {
         $('#range1').text("Range is: " + ($('#myRange').val()));
-        friendWeight1 = $('#myRange').val();
+        window.friendWeight1 = $('#myRange').val();
     });
 
     $('#myRange2').on('input', function () {
         $('#range2').text("Range is: " + ($('#myRange2').val()));
-        friendWeight2 = $('#myRange2').val();
+        window.friendWeight2 = $('#myRange2').val();
     });
 
     $('#myRange3').on('input', function () {
         $('#range3').text("Range is: " + ($('#myRange3').val()));
-        friendWeight3 = $('#myRange3').val();
+        window.friendWeight3 = $('#myRange3').val();
     });
 
 </script>
