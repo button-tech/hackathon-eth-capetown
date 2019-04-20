@@ -4,8 +4,6 @@ const BL = new Blockchain();
 //     "mainnet": Bitcore.Networks.livenet,
 // }, "mainnet");
 
-// Цени момент золотых лет (c) Test Travis
-
 /**
  * Start timer
  * @param duration {Number} timer time in minutes
