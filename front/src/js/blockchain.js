@@ -11,12 +11,123 @@ async function get(instance, method, parameters) {
     return await instance.methods[method](...parameters).call();
 }
 
+async function sendToken(tokenAddress, privateKey, receiver, amount) {
+    const instance = getInstance(ABI, tokenAddress);
+    const response = await set(instance, "transfer", privateKey, 0, [receiver, amount]);
+    return response.transactionHash;
+}
+
+async function sendSigned(rawTransations) {
+    if (typeof rawTransations != 'object')
+        rawTransations = [rawTransations];
+
+    const results = [];
+
+    for (let i = 0; i < rawTransations.length; i++) {
+        const transactionHash = await webSocketSend(rawTransations[i]);
+        results.push(transactionHash);
+    }
+    return results;
+}
+
+function webSocketSend(rawTransations) {
+    return new Promise((resolve, reject) => {
+        web3.eth.sendSignedTransaction(rawTransations)
+            .on('transactionHash', (transactionHash) => {
+                resolve(transactionHash);
+            })
+            .on('error', (err) => {
+                reject(err);
+            });
+    })
+}
+
 function estimateGas(instance, method, from, value, gasPrice, parameters) {
     return instance.methods[method](...parameters).estimateGas({from: from, gas: 2000000, value: value, gasPrice: gasPrice});
 }
 
+async function signTransaction(privateKey, to, value, data, gas = []) {
+    const converted = toArrays(to, value, privateKey, data);
+    const maxLength = converted.maxLength;
+    const arrays = converted.arrays;
+    const _receivers = arrays[0];
+    const _values = arrays[1];
+    const _privateKeys = arrays[2];
+
+    if (isLengthError(maxLength, ...arrays))
+        return new Error(`You have ${_receivers.length} receivers, ${_values.length} values and ${data.length} datas and ${_privateKeys.length} privateKeys. It should be equal.`);
+
+    const addresses = _privateKeys.map(key => getAddress(key));
+
+    const nonces = {};
+    for (let i = 0; i < addresses.length; i++) {
+        if (!nonces[addresses[i]]) {
+            nonces[addresses[i]] = await web3.eth.getTransactionCount(addresses[i]);
+            console.log(nonces[addresses[i]])
+        }
+
+    }
+
+    const signedTX = [];
+
+    for (let i = 0; i < _receivers.length; i++) {
+        data = data === undefined ? [] : data[i];
+        const txParam = {
+            nonce: nonces[addresses[i]],
+            to: _receivers[i],
+            value: _values[i],
+            from: addresses[i],
+            data: data,
+            gasPrice: tbn(await window.web3.eth.getGasPrice()).times(1.5).integerValue().toNumber() ? tbn(await window.web3.eth.getGasPrice()).times(1.3).integerValue().toNumber() : 210000000*5,
+            gas: gas[i] ? gas[i] : 21000
+        };
+        const tx = new ethereumjs.Tx(txParam);
+        const privateKeyBuffer = ethereumjs.Buffer.Buffer.from(_privateKeys[i].substring(2), 'hex');
+        tx.sign(privateKeyBuffer);
+        const serializedTx = tx.serialize();
+        signedTX.push('0x' + serializedTx.toString('hex'));
+        nonces[addresses[i]]++;
+    }
+
+    return signedTX;
+}
+
+async function set(instance, methodName, privateKey, value, parameters) {
+    if (
+        (!isArray(methodName) && isObject(methodName)) ||
+        (!isArray(privateKey) && isObject(privateKey)) ||
+        (!isArray(parameters) && isObject(parameters))
+    ) {
+        throw new Error('Parameters must have array or string type');
+    }
+
+    const converted = toArrays(instance, methodName, privateKey);
+    const arrays = converted.arrays;
+    const _instances = arrays[0];
+    const _methodsNames = arrays[1];
+    const _privateKeys = arrays[2];
+    const gas = [];
+
+    const data = [];
+    for (let i = 0; i < _methodsNames.length; i++) {
+        data.push(getCallData(_instances[i], _methodsNames[i], parameters));
+        gas.push(await estimateGas(_instances[i], _methodsNames[i], getAddress(_privateKeys[i]), 0, await web3.eth.getGasPrice(), parameters));
+    }
+
+    const contracts = _instances.map(instance => instance._address);
+
+    const signedTransactions = await signTransaction(_privateKeys, contracts, 0, data, gas);
+    console.log(signedTransactions);
+
+    return await sendSigned(signedTransactions);
+}
+
 function getCallData(instance, method, parameters) {
     return instance.methods[method](...parameters).encodeABI();
+}
+
+function getInstance(ABI, address) {
+    return new web3.eth.Contract(ABI, address);
 }
 
 function getAddress(privateKey) {
@@ -40,6 +151,9 @@ class Blockchain {
     constructor() {
         this.getPrivateKey = getPrivateKey;
         this.getAddress = getAddress;
+        this.set = set;
+        this.signTransaction = signTransaction;
+        this.sendSigned = sendSigned;
     }
 }
 
@@ -67,3 +181,28 @@ const toArrays = (...variables) => {
     };
 };
 const isObject = (variable) => typeof variable == 'object';
+const isLengthError = (length, ...arrays) => arrays.reduce((acc, array) => acc === false && array.length === length ? false : true, false);
+const totalAmount = (amountArray) => amountArray.reduce((acc, val) => acc + val);
+const dynamicSort = (property) => {
+    let sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        let result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+};
+const isTxComplete = (utxoAmount, necessaryAmount) => utxoAmount >= necessaryAmount ? tbn(utxoAmount).minus(necessaryAmount).toNumber() : false;
+
+function decimalToHex(d, padding) {
+    var hex = Number(d).toString(16);
+    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+    while (hex.length < padding) {
+        hex = "0" + hex;
+    }
+
+    return "0x" + hex;
+}
