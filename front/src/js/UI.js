@@ -1,4 +1,5 @@
-const backendURL = 'https://capetown.buttonwallet.com/api';
+//const backendURL = 'https://capetown.buttonwallet.com/api';
+const backendURL = 'http://localhost:3000/api';
 
 const explorers = {
     "Ethereum": {
@@ -34,7 +35,10 @@ function openLoader() {
 }
 
 function closeLoader() {
-    document.getElementById('loader').style.display = 'none';
+    const elem = document.getElementById('loader');
+    if (elem){
+        elem.style.display = 'none';
+    }
 }
 
 function addError(errorText) {
@@ -133,65 +137,65 @@ const query = async (method, url, data) => {
 };
 
 function checkPwd() {
-    $("input[type=password]").keyup(function(){
+    $("input[type=password]").keyup(function () {
         var ucase = new RegExp("[A-Z]+");
         var lcase = new RegExp("[a-z]+");
         var num = new RegExp("[0-9]+");
 
-        if($("#password1").val().length >= 8){
+        if ($("#password1").val().length >= 8) {
             $("#8char").removeClass("fa-remove");
             $("#8char").addClass("fa-check");
-            $("#8char").css("color","#00A41E");
-        }else{
+            $("#8char").css("color", "#00A41E");
+        } else {
             $("#8char").removeClass("fa-check");
             $("#8char").addClass("fa-remove");
-            $("#8char").css("color","#FF0004");
+            $("#8char").css("color", "#FF0004");
         }
 
-        if(ucase.test($("#password1").val())){
+        if (ucase.test($("#password1").val())) {
             $("#ucase").removeClass("fa-remove");
             $("#ucase").addClass("fa-check");
-            $("#ucase").css("color","#00A41E");
-        }else{
+            $("#ucase").css("color", "#00A41E");
+        } else {
             $("#ucase").removeClass("fa-check");
             $("#ucase").addClass("fa-remove");
-            $("#ucase").css("color","#FF0004");
+            $("#ucase").css("color", "#FF0004");
         }
 
-        if(lcase.test($("#password1").val())){
+        if (lcase.test($("#password1").val())) {
             $("#lcase").removeClass("fa-remove");
             $("#lcase").addClass("fa-check");
-            $("#lcase").css("color","#00A41E");
-        }else{
+            $("#lcase").css("color", "#00A41E");
+        } else {
             $("#lcase").removeClass("fa-check");
             $("#lcase").addClass("fa-remove");
-            $("#lcase").css("color","#FF0004");
+            $("#lcase").css("color", "#FF0004");
         }
 
-        if(num.test($("#password1").val())){
+        if (num.test($("#password1").val())) {
             $("#num").removeClass("fa-remove");
             $("#num").addClass("fa-check");
-            $("#num").css("color","#00A41E");
-        }else{
+            $("#num").css("color", "#00A41E");
+        } else {
             $("#num").removeClass("fa-check");
             $("#num").addClass("fa-remove");
-            $("#num").css("color","#FF0004");
+            $("#num").css("color", "#FF0004");
         }
 
-        if($("#password1").val() == $("#password2").val()){
+        if ($("#password1").val() == $("#password2").val()) {
             $("#pwmatch").removeClass("fa-remove");
             $("#pwmatch").addClass("fa-check");
-            $("#pwmatch").css("color","#00A41E");
-        }else{
+            $("#pwmatch").css("color", "#00A41E");
+        } else {
             $("#pwmatch").removeClass("fa-check");
             $("#pwmatch").addClass("fa-remove");
-            $("#pwmatch").css("color","#FF0004");
+            $("#pwmatch").css("color", "#FF0004");
         }
     });
 }
 
 const ADDRESSES = {
-  "BUFF": "0x3e50bf6703fc132a94e4baff068db2055655f11b",
-  "DAI": "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359",
-  "KNC": "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"
+    "BUFF": "0x3e50bf6703fc132a94e4baff068db2055655f11b",
+    "DAI": "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359",
+    "KNC": "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"
 };

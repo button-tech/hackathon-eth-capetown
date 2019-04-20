@@ -17,6 +17,7 @@ class Wallet {
             this.wallet= getInstance(wallet_abi, address);
             this.walletAddress = address;
         }
+        debugger
     }
     
     // return: new contract address

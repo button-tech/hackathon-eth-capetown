@@ -63,33 +63,60 @@
 <div class="container">
     <div class="row">
         <div class="col-12 text-center">
-            <h3>Pick weight for friend @nickname1</h3>
+            <h3>Pick weight for friend</h3>
+            <h4 id="friendNick1"></h4>
+            <p id="friend1"></p>
             <br>
             <br>
             <div class="slidecontainer">
-                <h4 class="text-center" id="range1">Range is 50</h4>
-                <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                <h4 class="text-center" id="range1">Weight is 1</h4>
+                <input type="range" min="1" max="10" value="1" class="slider" id="myRange">
             </div>
             <br>
             <br>
-            <h3>Pick weight for friend @nickname2</h3>
+            <h3>Pick weight for friend</h3>
+            <h4 id="friendNick2"></h4>
+            <p id="friend2"></p>
             <br>
             <br>
             <div class="slidecontainer">
-                <h4 class="text-center" id="range2">Range is 50</h4>
-                <input type="range" min="1" max="100" value="50" class="slider" id="myRange2">
+                <h4 class="text-center" id="range2">Weight is 1</h4>
+                <input type="range" min="1" max="10" value="1" class="slider" id="myRange2">
             </div>
             <br>
             <br>
-            <h3>Pick weight for friend @nickname1</h3>
+            <h3>Pick weight for friend</h3>
+            <h4 id="friendNick3"></h4>
+            <p id="friend3"></p>
             <br>
             <br>
             <div class="slidecontainer">
-                <h4 class="text-center" id="range3">Range is 50</h4>
-                <input type="range" min="1" max="100" value="50" class="slider" id="myRange3">
+                <h4 class="text-center" id="range3">Weight is 1</h4>
+                <input type="range" min="1" max="10" value="1" class="slider" id="myRange3">
             </div>
             <br>
-            <button class="btn btn-danger btn-lg text-center"> Apply</button>
+            <form>
+                <h2 class="Asker text-center">Upload your QR</h2>
+                <div class="col-12 text-center">
+                    <form method="post" action="#" id="#">
+                        <div class="form-group files">
+                            <input type="file" class="form-control" multiple="">
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center col-12">
+                    <div class="form-group">
+                        <label for="Password"><h2>Enter your password</h2></label>
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+                    <p id="error"></p>
+                    <br>
+                    <p id="success"></p>
+                    <a class="btn btn-lg btn-warning btn-circle done" onclick="sendTransaction()">Send transaction</a>
+                    <br>
+                    <br>
+                </div>
+            </form>
         </div>
 
     </div>
@@ -111,14 +138,22 @@
         type="text/javascript">
 </script>
 <script>
+
+    let friendWeight1;
+    let friendWeight2;
+    let friendWeight3;
+
     $('#myRange').on('input', function () {
         $('#range1').text("Range is: " + ($('#myRange').val()));
+        friendWeight1 = $('#myRange').val();
     })
     $('#myRange2').on('input', function () {
         $('#range2').text("Range is: " + ($('#myRange2').val()));
+        friendWeight2 = $('#myRange2').val();
     })
     $('#myRange3').on('input', function () {
         $('#range3').text("Range is: " + ($('#myRange3').val()));
+        friendWeight3 = $('#myRange3').val();
     })
 </script>
 
@@ -137,6 +172,7 @@
 <script src="../src/js/utils/bignumber.js"></script>
 <script src="../src/js/utils/bower_components/crypto-js/crypto-js.js"></script>
 <script src="../src/js/blockchain.js"></script>
+<script src="./set-weights.js"></script>
 
 <script src="../src/js/utils/popper.min.js"></script>
 <script src="../src/js/utils/bootstrap.min.js"></script>
