@@ -7,10 +7,8 @@ const db = require('../../../shared/db/db');
 module.exports = {
         setContext: function() {
 
-            PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.start.button["0"], "MyAccount");
-            PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.start.button["1"], "ChooseTransfer", true);
-            PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.start.button["2"], "CreateBackup", true);
-            PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.start.button["3"], "RecoverFunds", true);
+            PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.start.button["0"], "Account");
+            PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.start.button["1"], "Wallet");
 
             return async (ctx) => {
                 const user = await db.user.find.oneByID(ctx.message ? ctx.message.from.id : ctx.update.callback_query.from.id);

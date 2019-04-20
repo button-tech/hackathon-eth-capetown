@@ -4,19 +4,26 @@
       "text": "ℹ️ Main menu",
       "button": {
         "0": "👤 Account",
-        "1": "🖋 Send",
-        "2": "🦉 Pick friends",
-        "3": "🌈 Restore ZAE wallet",
-        "4": "Friendship requests",
-        "5": "Deposit funds",
-        "6": "🖋 Send deposited funds"
+        "1": "💸 Wallet"
       }
     },
     "account": {
       "text": "This is your account",
       "button": {
-        "0": "ETH address",
-        "1": "Balance"
+        "0": "💰 Balance",
+        "1": "♦ Address",
+        "2": "😜 Friends list",
+        "3": "➡ Pick / Change Friends"
+      }
+    },
+    "wallet":{
+      "button":{
+        "0": "💵 Send",
+        "1": "💵 Send SRW",
+        "2": "🌀 Restore Access",
+        "3": "⚡ Depoist",
+        "4": "🚀 Withdraw"
+
       }
     }
   },

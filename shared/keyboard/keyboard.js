@@ -9,8 +9,12 @@ Text.inline_keyboard.save_money["0"].callback = domainName + Text.inline_keyboar
 
 const start = [
     [Text.keyboard.start.button["0"], Text.keyboard.start.button["1"]],
-    [Text.keyboard.start.button["2"], Text.keyboard.start.button["3"]],
-    [Text.keyboard.start.button["4"]],
+];
+
+const wallet = [
+    [Text.keyboard.wallet.button["0"], Text.keyboard.wallet.button["1"]],
+    [Text.keyboard.wallet.button["2"], Text.keyboard.wallet.button["3"],Text.keyboard.wallet.button["4"]],
+    [Text.back]
 ];
 
 const startRegistredForBackup = [
@@ -20,14 +24,15 @@ const startRegistredForBackup = [
 ];
 
 const account = [
-    [Text.keyboard.account.button["0"]],
-    [Text.keyboard.account.button["1"]],
+    [Text.keyboard.account.button["0"],Text.keyboard.account.button["1"]],
+    [Text.keyboard.account.button["2"], Text.keyboard.account.button["3"]],
     [Text.back]
 ];
 
 const chooseTransfer = [
     ["Ethereum"],
     ["DAI"],
+    [Text.back]
 ];
 
 const back = [
@@ -64,6 +69,7 @@ const restore_acc = (guid) => Markup.inlineKeyboard([
 module.exports = {
     start: start,
     account: account,
+    wallet:wallet,
     restore_acc: restore_acc,
     create_wallet: create_wallet,
     create_transaction: create_transaction,
