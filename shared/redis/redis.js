@@ -9,6 +9,13 @@ function getData(key) {
     return getAsync(key)
 }
 
+function setData(key, value, keyLifetime = 999999999999999) {
+    return client.set(key, value, 'EX', keyLifetime);
+}
+
+function deleteData(key) {
+    return client.del(key);
+}
 
 module.exports = {
   setData: setData,
