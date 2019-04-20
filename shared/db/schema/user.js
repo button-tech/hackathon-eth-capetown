@@ -29,4 +29,6 @@ const User = new Schema({
     versionKey: false
 });
 
+// v1.0
+
 module.exports = mongoose.model('User', User);
