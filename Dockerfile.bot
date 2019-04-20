@@ -1,0 +1,29 @@
+FROM node:latest
+
+WORKDIR /app
+
+ADD telegram /app/telegram
+ADD shared /app/shared
+
+WORKDIR /app/shared
+RUN npm rebuild
+
+WORKDIR /app/telegram
+RUN export NODE_PATH=node_modules
+RUN npm rebuild
+
+ENV BOT_TOKEN=
+ENV URL=
+ENV LOGIN=
+ENV PASSWORD=
+ENV DB=
+ENV INFURA_TOKEN=
+
+EXPOSE 3000
+EXPOSE 6379
+EXPOSE 27017
+EXPOSE 8545
+
+ENTRYPOINT ["node", "app.js"]
+
+
