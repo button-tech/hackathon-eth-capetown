@@ -145,16 +145,41 @@ async function recover(req, res) {
     // }
 }
 
-async function createNewAccount(req, res) {
-    const id = req.params.guid;
-    const {ethereumAddress, walletAddress} = req.body;
+async function recordWalletAddress(req, res) {
+    const {id, walletAddress} = req.params;
 
     redis.getData(id)
         .then(async value => {
 
             value = JSON.parse(value);
 
-            await db.user.update.setRecoveryAddress(value.userID, ethereumAddress, walletAddress);
+            await db.user.update.setWalletAddress(value.userID, walletAddress);
+
+            redis.deleteData(id);
+
+            res.send({
+                error: null,
+                result: 'success'
+            });
+        })
+        .catch(e => {
+            res.send({
+                error: e.message,
+                result: null
+            });
+        })
+}
+
+async function createNewAccount(req, res) {
+    const id = req.params.guid;
+    const {ethereumAddress} = req.body;
+
+    redis.getData(id)
+        .then(async value => {
+
+            value = JSON.parse(value);
+
+            await db.user.update.setRecoveryAddress(value.userID, ethereumAddress);
 
             const user = await db.user.find.oneByID(value.userID);
 
@@ -171,7 +196,6 @@ async function createNewAccount(req, res) {
                   troubleUserId:user.userID,
                   troubleUserNickname:user.nickname,
                   troubleUserAddress:user.ethereumAddress,
-                  walletAddress: walletAddress,
                   lifetime: Date.now() + (utils.keyLifeTime * 1000),
               });
 
@@ -256,5 +280,6 @@ module.exports = {
     register: register,
     createNewAccount: createNewAccount,
     recover: recover,
-    recordSignature: recordSignature
+    recordSignature: recordSignature,
+    recordWalletAddress: recordWalletAddress
 };

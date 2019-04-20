@@ -84,9 +84,18 @@ const user = {
                 });
             });
         },
-        setRecoveryAddress : async (userID, recoveryAddress, walletAddress)=>{
+        setWalletAddress: async (userID, walletAddress)=>{
             return new Promise((resolve, reject) => {
-                User.updateOne({userID: userID}, {recoveryAddress: recoveryAddress, walletAddress: walletAddress}, (err, doc) => {
+                User.updateOne({userID: userID}, {walletAddress: walletAddress}, (err, doc) => {
+                    if (err)
+                        reject(err);
+                    resolve(doc);
+                });
+            });
+        },
+        setRecoveryAddress : async (userID, recoveryAddress)=>{
+            return new Promise((resolve, reject) => {
+                User.updateOne({userID: userID}, {recoveryAddress: recoveryAddress}, (err, doc) => {
                     if (err)
                         reject(err);
                     resolve(doc);
