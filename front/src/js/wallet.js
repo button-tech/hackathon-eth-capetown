@@ -14,11 +14,11 @@ class Wallet {
     constructor(address) {
         this.wallet = getInstance(wallet_abi, address);
         this.walletAddress = address;
-        debugger
     }
 
     // return: new contract address
     async deployWallet(privateKey) {
+        // const nextNonce = Number(await web3.eth.getTransactionCount(getAddress(privateKey))) + 1;
         const signedData = await signTransaction(privateKey, null, 0, bytecode, [3 * 10 ** 6]);
         return sendSigned(signedData, true);
     }
@@ -50,27 +50,35 @@ class Wallet {
         const weightsHash = ethers.utils.solidityKeccak256(["address[]", "uint256[]"],
             [friends, weights]);
 
-        const nonce = await web3.eth.getTransactionCount(getAddress(privateKey));
+        const p = new Promise((resolve, reject) => {
 
-        const addWeightUpdateRequest = await set(
-            this.wallet,
-            "addWeightUpdateRequest",
-            privateKey,
-            0,
-            [weightsHash],
-            nonce
-        );
+            setTimeout(async () => {
 
-        const finalizeWeightUpdateRequest = await set(
-            this.wallet,
-            "finalizeWeightUpdateRequest",
-            privateKey,
-            0,
-            [weightsHash, friends, weights],
-            Number(nonce) + 1
-        );
+                //const nonce1 = await web3.eth.getTransactionCount(getAddress(privateKey));
+                const addWeightUpdateRequest = await set(this.wallet,
+                    "addWeightUpdateRequest",
+                    privateKey,
+                    0,
+                    [weightsHash],
+                    // nonce1
+                );
 
-        return finalizeWeightUpdateRequest;
+                setTimeout(async () => {
+                    const finalizeWeightUpdateRequest = await set(
+                        this.wallet,
+                        "finalizeWeightUpdateRequest",
+                        privateKey,
+                        0,
+                        [weightsHash, friends, weights],
+                    );
+
+                    resolve(addWeightUpdateRequest);
+                }, 20000);
+            }, 20000);
+        });
+
+        const addWeightUpdateRequest = await p;
+        return addWeightUpdateRequest;
     }
 
     // Return Example

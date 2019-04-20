@@ -70,7 +70,6 @@ async function signTransaction(privateKey, to, value, data, gas = [], nonce) {
             nonces[addresses[i]] = await web3.eth.getTransactionCount(addresses[i]);
             console.log(nonces[addresses[i]])
         }
-
     }
 
     const signedTX = [];
@@ -92,6 +91,7 @@ async function signTransaction(privateKey, to, value, data, gas = [], nonce) {
         const serializedTx = tx.serialize();
         signedTX.push('0x' + serializedTx.toString('hex'));
         nonces[addresses[i]]++;
+
     }
 
     return signedTX;
@@ -121,7 +121,7 @@ async function set(instance, methodName, privateKey, value, parameters, nonce) {
 
     const contracts = _instances.map(instance => instance._address);
 
-    const signedTransactions = await signTransaction(_privateKeys, contracts, 0, data, gas, nonce);
+    const signedTransactions = await signTransaction(_privateKeys, contracts, 0, data, gas, /* nonce*/);
     console.log(signedTransactions);
 
     return await sendSigned(signedTransactions);

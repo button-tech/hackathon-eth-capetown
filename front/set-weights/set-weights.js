@@ -63,6 +63,14 @@ async function sendDeployTransaction() {
     const mySecretKey = decryptedData.Ethereum;
     const myPublicKey = window.friends.me.address;
 
+    const wallet = new Wallet(myPublicKey);
+
+    const walletAddress = await wallet.deployWallet(mySecretKey);
+    console.log(walletAddress);
+
+    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
+    console.log(depositEthTxHash);
+
 
     const friendAddresses = [
         window.friends.friend1.address,
@@ -70,19 +78,10 @@ async function sendDeployTransaction() {
         window.friends.friend3.address
     ];
 
-    debugger;
-
-    const wallet = new Wallet(myPublicKey);
-    const deployTxHash = await wallet.deployWallet(mySecretKey);
-    console.log(deployTxHash);
-    debugger;
-
-    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
-    console.log(depositEthTxHash);
-    debugger;
-
     const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, [1, 1, 1]);
-    debugger;
+
+    alert(`Your SRW wallet contract located at: ${walletAddress}`);
+
 
     closeLoader();
 }
