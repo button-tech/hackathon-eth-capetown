@@ -1,0 +1,70 @@
+{
+  "keyboard": {
+    "start": {
+      "text": "ℹ️ Main menu",
+      "button": {
+        "0": "👤 Account",
+        "1": "🖋 Send",
+        "2": "🦉 Pick friends",
+        "3": "🌈 Restore ZAE wallet",
+        "4": "Friendship requests",
+        "5": "Deposit funds",
+        "6": "🖋 Send deposited funds"
+      }
+    },
+    "account": {
+      "text": "This is your account",
+      "button": {
+        "0": "ETH address",
+        "1": "Balance"
+      }
+    }
+  },
+  "inline_keyboard": {
+    "create_wallet": {
+      "text": "Here you can create account",
+      "0": {
+        "button": "🔐 Create wallet",
+        "callback": "http://127.0.0.1/create/?create="
+      }
+    },
+    "send_transaction": {
+      "text": "Tap the button to sign and send transaction",
+      "0": {
+        "button": "🖋 Send money",
+        "callback": "http://127.0.0.1/send/?tx="
+      }
+    },
+    "save_money": {
+      "text": "Be careful with your money",
+      "0": {
+        "button": "Register",
+        "callback": "http://127.0.0.1/confirm-friendship/?save="
+      },
+      "1": {
+        "button": "Select other friends",
+        "callback": "selectOtherFriend"
+      },
+      "err":{
+        "notThreeFriends":"Sorry, but you can add only 3 friends",
+        "notReg": "This friend not register in bot"
+      }
+    }
+  },
+  "dialog": {
+    "sendTransaction": {
+      "1": "Choose currency",
+      "2": "Enter receiver @nickname or address or ENS domain!",
+      "3": "Enter amount of currency (10 or 1$)",
+      "4": "Enter token address"
+    },
+    "createBackup": {
+      "0": "You have already chosen friends",
+      "1": "Enter first friend's nickname",
+      "2": "Enter second friend's nickname",
+      "3": "Enter third friend's nickname",
+      "4": "Waiting for friends acceptance"
+    }
+},
+  "back": "❌ Back"
+}
