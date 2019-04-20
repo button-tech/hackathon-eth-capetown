@@ -66,7 +66,7 @@ const sendInlineButtonCallbackType = (userID, text, buttonText, callback) => {
             'reply_markup': JSON.stringify({
                 "inline_keyboard": [[{
                     "text": text,
-                    "callback": callback,
+                    "callback_data": callback,
                 }]],
             }),
             'disable_web_page_preview': true

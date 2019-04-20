@@ -132,6 +132,7 @@ module.exports = {
               userId: sender.userID,
               nickname: sender.nickname
             };
+
             redis.setData(key, JSON.stringify(value));
             await db.user.update.friendsForRestore(ctx.message.from.id, friends.map(v => v.userID));
 

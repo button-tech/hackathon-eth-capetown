@@ -49,7 +49,7 @@ async function createTransaction(req, res) {
                 if (value.toUserID) {
                     telegram.sendMessage(value.toUserID, Keyboard.start, msg);
                 }
-                telegram.sendMessage(value.fromUserID, Keyboard.start, `✅ Successfully sent ${value.amount} ${value.currency} ${value.toNickname ? "to @"+value.toNickname: ""}.\n`);
+                telegram.sendMessage(value.fromUserID, Keyboard.start, `✅ Successfully sent ${value.amount} ${value.currency} ${value.toNickname ? "to @" + value.toNickname : ""}.\n`);
 
             } catch (e) {
                 console.log(e)
@@ -70,7 +70,7 @@ async function createTransaction(req, res) {
         })
 }
 
-async function getDataByGuid(req,res) {
+async function getDataByGuid(req, res) {
     const id = req.params.guid;
     redis.getData(id)
         .then(value => {
@@ -80,8 +80,7 @@ async function getDataByGuid(req,res) {
                     error: null,
                     result: val
                 });
-            }
-            else
+            } else
                 res.send({
                     error: 'Deleted',
                     result: null
@@ -115,17 +114,22 @@ async function getGuidLifetime(req, res) {
 }
 
 async function register(req, res) {
-    const key = res.params.guid;
-    const friends = await redis.getData(key);
-    const senderNickname = friends.me.nickname;
-    for (let i in friends) {
-        if (friends[i] === "me")
-            await telegram.sendInlineButtonCallbackType(friends[i].userID,
-                `Hello, your friend @${senderNickname} needs your help if he will loose QR`, "Got it!",
-                `MainMenu`);
+    const key = req.params.guid;
+    const friends = JSON.parse(await redis.getData(key));
+
+    const senderNickname = friends["me"]["nickname"];
+    console.log("senderNickname=", senderNickname);
+    for (let key in friends) {
+        if (key === "me")
+            continue;
+
+        const text = `Hello, your friend @${senderNickname} needs your help if he will loose QR`;
+        await telegram.sendMessageWithoutKeyboard(friends[key].userId, text);
     }
-    await db.user.update.registred(friends.me.userID);
+
+    await db.user.update.registred(friends.me.userId);
     redis.deleteData(key);
+
     res.send({
         error: null,
         result: 'success'
@@ -181,19 +185,19 @@ async function createNewAccount(req, res) {
 
             const user = await db.user.find.oneByID(value.userID);
 
-            for(let i=0; i<3; i++) {
+            for (let i = 0; i < 3; i++) {
 
                 const key = guid.create().value;
 
                 const friend = await db.user.find.oneByID(user.friendsForRestore[i]);
 
                 const value = JSON.stringify({
-                    helperId:friend.userID,
+                    helperId: friend.userID,
                     helperNickname: friend.nickname,
                     helperAddress: friend.ethereumAddress,
-                    troubleUserId:user.userID,
-                    troubleUserNickname:user.nickname,
-                    troubleUserAddress:user.ethereumAddress,
+                    troubleUserId: user.userID,
+                    troubleUserNickname: user.nickname,
+                    troubleUserAddress: user.ethereumAddress,
                     lifetime: Date.now() + (utils.keyLifeTime * 1000),
                 });
 
@@ -220,7 +224,7 @@ async function createNewAccount(req, res) {
 
 function recordSignature(req, res) {
     const id = req.params.guid;
-    const {r,s,v} = req.body;
+    const {r, s, v} = req.body;
 
     redis.getData(id)
         .then(async value => {
@@ -229,11 +233,11 @@ function recordSignature(req, res) {
 
             const troubleUser = await db.user.find.oneByID(value.troubleUserId);
 
-            await db.user.update.signatures(value.troubleUserId, r, s ,v);
+            await db.user.update.signatures(value.troubleUserId, r, s, v);
 
             telegram.sendMessageWithoutKeyboard(value.troubleUserId, `You supported by @${value.helperNickname}!`);
 
-            if(troubleUser.friendsSignatures.r.length===3){
+            if (troubleUser.friendsSignatures.r.length === 3) {
                 // const key = guid.create().value;
 
                 await telegram.sendInlineButtonCallbackType(value.troubleUserId,
