@@ -86,11 +86,11 @@ async function sendDeployTransaction() {
 
     const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
     console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
-
-    alert(`Your SRW wallet contract located at: ${walletAddress}`);
-
+    await sendWalletAddressToServer(walletAddress);
 
     closeLoader();
+
+    alert(`Your SRW wallet contract located at: ${walletAddress}`);
 }
 
 /**
@@ -112,10 +112,10 @@ function setTransactionURL(currency, network, txHash) {
  * @param value amount of currency
  * @returns {Promise<*>}
  */
-async function sendTransactionDataToServer(txHash) {
+async function sendWalletAddressToServer(walletAddress) {
     const guid = getShortlink();
-    const url = `${backendURL}/transaction/${guid}`;
-    return await query('PUT', url, JSON.stringify({"txHash": txHash}));
+    const url = `${backendURL}/walletAddress/${guid}/${walletAddress}`;
+    return await query('POST', url);
 }
 
 /**
