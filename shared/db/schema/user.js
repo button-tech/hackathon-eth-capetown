@@ -21,6 +21,19 @@ const User = new Schema({
       type: Boolean,
       default: false
     },
+    recoveryAddress: {
+        type: String,
+        default: ''
+    },
+    tmpAddress: {
+        type: String,
+        default: ''
+    },
+    friendsSignatures: {
+        r: Array,
+        s: Array,
+        v: Array,
+    },
     registrationDate: {
         type: Date,
         default: Date.now()
@@ -28,7 +41,5 @@ const User = new Schema({
 }, {
     versionKey: false
 });
-
-// v1.0
 
 module.exports = mongoose.model('User', User);

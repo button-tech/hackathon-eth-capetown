@@ -13,6 +13,15 @@ bot.telegram.setWebhook(process.env.NGROK + '/bot');
 
 bot.use(session({ ttl: 10 }));
 
+const callbackRegister = new CallbackRegister(bot);
+callbackRegister.loadCallbacksFromRedis();
+PageConstructor.init(bot, callbackRegister);
+
+bot.start(PageConstructor.render("MainMenu"));
+bot.hears(Text.back, PageConstructor.render("MainMenu"));
+
+app.post('/bot', (req, res) => {});
+
 app.listen(8080,()=>{
     console.log("Nice!")
 });

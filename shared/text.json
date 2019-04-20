@@ -4,7 +4,7 @@
       "text": "ℹ️ Main menu",
       "button": {
         "0": "👤 Account",
-        "1": "🖋 Send",
+        "1": "💸 Send",
         "2": "🦉 Pick friends",
         "3": "🌈 Restore ZAE wallet",
         "4": "Friendship requests",
@@ -25,21 +25,21 @@
       "text": "Here you can create account",
       "0": {
         "button": "🔐 Create wallet",
-        "callback": "http://127.0.0.1/create/?create="
+        "callback": "/create/?create="
       }
     },
     "send_transaction": {
       "text": "Tap the button to sign and send transaction",
       "0": {
-        "button": "🖋 Send money",
-        "callback": "http://127.0.0.1/send/?tx="
+        "button": "💸 Send money",
+        "callback": "/send/?tx="
       }
     },
     "save_money": {
       "text": "Be careful with your money",
       "0": {
         "button": "Register",
-        "callback": "http://127.0.0.1/confirm-friendship/?save="
+        "callback": "/confirm-friendship/?save="
       },
       "1": {
         "button": "Select other friends",
@@ -48,6 +48,13 @@
       "err":{
         "notThreeFriends":"Sorry, but you can add only 3 friends",
         "notReg": "This friend not register in bot"
+      }
+    },
+    "restore_acc":{
+      "text":"Your friend lost hist QR. Pls help him restore it",
+      "0":{
+        "button":"Help",
+        "callback":"/restore/?restore="
       }
     }
   },

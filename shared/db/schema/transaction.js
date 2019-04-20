@@ -34,6 +34,4 @@ const Transaction = new Schema({
     versionKey: false
 });
 
-//v 2.0
-
 module.exports = mongoose.model('Transaction', Transaction);

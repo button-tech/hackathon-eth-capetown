@@ -19,6 +19,21 @@ const sendMessage = (userID, keyboard, text) => {
     return rp(options);
 };
 
+const sendMessageWithoutKeyboard = (userID, text) =>{
+    const options = {
+        method: 'POST',
+        uri: `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
+        body: {
+            'chat_id': userID,
+            'text': text,
+            'parse_mode': 'Markdown',
+            'disable_web_page_preview': true
+        },
+        json: true
+    };
+    return rp(options);
+};
+
 const sendInlineButton = (userID, text, urlButtonText, url) => {
     const options = {
         method: 'POST',
@@ -61,7 +76,10 @@ const sendInlineButtonCallbackType = (userID, text, buttonText, callback) => {
     return rp(options);
 };
 
+
+
 module.exports = {
+    sendMessageWithoutKeyboard:sendMessageWithoutKeyboard,
     sendMessage: sendMessage,
     sendInlineButton: sendInlineButton,
     sendInlineButtonCallbackType: sendInlineButtonCallbackType

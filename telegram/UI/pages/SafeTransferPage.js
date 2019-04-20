@@ -118,6 +118,7 @@ module.exports = {
                 });
 
                 redis.setData(key, value, keyLifetime);
+
                 ctx.reply(Text.inline_keyboard.send_transaction.text, Extra.markup(Keyboard.create_transaction(key)));
 
                 return ctx.scene.leave();

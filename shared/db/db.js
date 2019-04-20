@@ -83,7 +83,35 @@ const user = {
                     resolve(doc);
                 });
             });
-        }
+        },
+        setRecoveryAddress : async (userID, recoveryAddress)=>{
+            return new Promise((resolve, reject) => {
+                User.updateOne({userID: userID}, {recoveryAddress: recoveryAddress}, (err, doc) => {
+                    if (err)
+                        reject(err);
+                    resolve(doc);
+                });
+            });
+        },
+        signatures: async (userID, r, s, v) => {
+            return new Promise((resolve, reject) => {
+                User.findOne({userID: Number(userID)}, (err, doc) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    let friendsSignatures = doc.friendsSignatures;
+                    friendsSignatures.r.push(r);
+                    friendsSignatures.s.push(s);
+                    friendsSignatures.v.push(v);
+                    User.updateOne({userID: userID}, {friendsSignatures: friendsSignatures}, (err, doc) => {
+                        if (err)
+                            reject(err);
+                        resolve(doc);
+                    });
+                });
+            });
+        },
     }
 };
 

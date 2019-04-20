@@ -27,12 +27,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/button-tech/hackthon_eth_capetown"
+    "url": ""
   },
-  "author": "enormousrage",
+  "author": "krboktv",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/button-tech/hackthon_eth_capetown"
+    "url": ""
   },
-  "homepage": "https://github.com/button-tech/hackthon_eth_capetown"
+  "homepage": ""
 }
