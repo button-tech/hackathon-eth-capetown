@@ -1,0 +1,27 @@
+FROM node:9
+
+WORKDIR /app
+
+ADD api /app/api
+ADD shared /app/shared
+
+
+WORKDIR /app/shared
+RUN npm rebuild
+
+WORKDIR /app/api
+RUN npm rebuild
+
+
+ENV BOT_TOKEN=
+ENV URL=
+ENV LOGIN=
+ENV PASSWORD=
+ENV DB=
+ENV INFURA_TOKEN=
+
+EXPOSE 3000
+EXPOSE 6379
+EXPOSE 27017
+
+ENTRYPOINT ["node", "api.js"]
