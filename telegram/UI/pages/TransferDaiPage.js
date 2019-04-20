@@ -9,7 +9,7 @@ const utils = require('../../utils/utils');
 const Markup = require('telegraf/markup');
 
 const keyLifetime = 600;
-
+// v1.0
 module.exports = {
     setContext: function(stage) {
 
