@@ -227,16 +227,16 @@ function recordSignature(req, res) {
 
             value = JSON.parse(value);
 
-            let troubleUser = await db.user.find.oneByID(value.troubleUserId);
+            const troubleUser = await db.user.find.oneByID(value.troubleUserId);
 
             await db.user.update.signatures(value.troubleUserId, r, s ,v);
 
-            // telegram.sendMessageWithoutKeyboard(value.troubleUserId, `Your friend supports @${value.helperNickname}!`);
+            telegram.sendMessageWithoutKeyboard(value.troubleUserId, `You supported by @${value.helperNickname}!`);
 
             if(troubleUser.friendsSignatures.r.length===3){
                 // const key = guid.create().value;
 
-                await telegram.sendInlineButtonCallbackType(user.friendsForRestore[i],
+                await telegram.sendInlineButtonCallbackType(value.troubleUserId,
                     `You supported by all your friends. Now you can use your new QR Code`, "ok",
                     `MainMenu`);
 
@@ -267,7 +267,6 @@ function recordSignature(req, res) {
                 result: null
             });
         })
-
 }
 
 module.exports = {

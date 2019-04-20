@@ -6,6 +6,7 @@ const domainName = process.env.DOMAIN_NAME ? process.env.DOMAIN_NAME : "http://1
 Text.inline_keyboard.create_wallet["0"].callback = domainName + Text.inline_keyboard.create_wallet["0"].callback;
 Text.inline_keyboard.send_transaction["0"].callback = domainName + Text.inline_keyboard.send_transaction["0"].callback;
 Text.inline_keyboard.save_money["0"].callback = domainName + Text.inline_keyboard.save_money["0"].callback;
+Text.inline_keyboard.save_money["2"].callback = domainName + Text.inline_keyboard.save_money["2"].callback;
 
 const start = [
     [Text.keyboard.start.button["0"], Text.keyboard.start.button["1"]],

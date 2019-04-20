@@ -52,6 +52,10 @@
         "button": "Select other friends",
         "callback": "selectOtherFriend"
       },
+      "2": {
+        "button": "Help",
+        "callback": "/sign-restore/?guid="
+      },
       "err":{
         "notThreeFriends":"Sorry, but you can add only 3 friends",
         "notReg": "This friend not register in bot"

@@ -5,6 +5,7 @@ const Keyboard = require('../../../shared/keyboard/keyboard');
 const Telegram = require('../../../shared/messangers/telegram');
 const Text = require('../../../shared/text');
 const db = require('../../../shared/db/db');
+const redis = require('../../../shared/redis/redis');
 const Markup = require('telegraf/markup');
 
 
@@ -14,7 +15,6 @@ module.exports = {
         const recoverFunds = new WizardScene(
             "recoverFunds",
             start,
-            firstNotification
         );
 
         return async (ctx) => {
@@ -32,38 +32,21 @@ module.exports = {
 
             ctx.session.friends = await Promise.all(user.friendsForRestore.map(userId => db.user.find.oneByID(userId)));
 
-            const friendsButtons = Keyboard.getFriendsButtons(ctx.session.friends);
+            const friends = ctx.session.friends;
+            for (let i = 0; i < friends.length; i ++) {
+                const key = guid.create().value;
+                const value = JSON.stringify({
+                    troubleUserId: user.userID,
+                    helperNickname: friends[i].nickname,
 
-            ctx.reply("Choose first friend that should help you", Markup
-                .keyboard(friendsButtons)
-                .resize()
-                .extra());
-
-            return ctx.wizard.next();
-        }
-
-        function firstNotification(ctx) {
-            if(ctx.message.text === Text.back) {
-                PageConstructor.render("MainMenu")(ctx);
-                return ctx.scene.leave();
+                });
+                redis.setData(key, value);
+                Telegram.sendInlineButton(friends[i].userID,
+                    `Your friend @${friends[i].nickname} needs your help`, Text.inline_keyboard.save_money["2"].button,
+                    `${Text.inline_keyboard.save_money["2"].callback}${key}`);
             }
 
-            const key = guid.create().value;
-
-            let userID;
-            for(let i=0;i<3;i++){
-                if(ctx.message.text===ctx.session.friends[i].nickname){
-                    userID = ctx.session.friends[i].userID
-                }
-            }
-
-            // redis.setData(key, JSON.stringify());
-
-            Telegram.sendInlineButton(userID,
-                Text.inline_keyboard.save_money.text, Text.inline_keyboard.save_money["0"].button,
-                `${Text.inline_keyboard.save_money["0"].callback}${key}`);
-
-            ctx.reply("Wait for conformation from friend");
+            ctx.reply("Wait for conformation from friends");
             PageConstructor.render("MainMenu")(ctx);
             return ctx.scene.leave();
         }
