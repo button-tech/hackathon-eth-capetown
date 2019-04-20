@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../src/styles/create/custom.css">
+    <title>SRW</title>
+    <style>
+        body {
+            font-family: "Roboto", sans-serif !important;
+        }
+
+        .slidecontainer {
+            width: 100%; /* Width of the outside container */
+        }
+
+        /* The slider itself */
+        .slider {
+            -webkit-appearance: none; /* Override default CSS styles */
+            appearance: none;
+            width: 100%; /* Full-width */
+            height: 25px; /* Specified height */
+            background: #d3d3d3; /* Grey background */
+            outline: none; /* Remove outline */
+            opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+            -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+            transition: opacity .2s;
+        }
+
+        /* Mouse-over effects */
+        .slider:hover {
+            opacity: 1; /* Fully shown on mouse-over */
+        }
+
+        /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none; /* Override default look */
+            appearance: none;
+            width: 25px; /* Set a specific slider handle width */
+            height: 25px; /* Slider handle height */
+            background: #000000; /* Green background */
+            cursor: pointer; /* Cursor on hover */
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px; /* Set a specific slider handle width */
+            height: 25px; /* Slider handle height */
+            background: #000000; /* Green background */
+            cursor: pointer; /* Cursor on hover */
+        }</style>
+    <title>ZAEbumba</title>
+</head>
+<body>
+<br>
+<br> <br>
+<br>
+<div class="container">
+
+    <div class="col-12">
+        <div class="loader" id='loader'>
+            <div class='loader-container'>
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <img style="max-width: 300px" src="../src/img/preview.png">
+                        <h4 id="steps"></h4>
+                    </div>
+                    <div class="col-12 bg">
+                        <div class="loader-spin" id="loader-4">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="canvas" width="300" height="300" style="display: none"></canvas>
+    <img src="#" id="qrImage" align="left" style="display: none">
+
+    <div class="row">
+        <p id="owner-new-address"></p>
+        <p id="signature"></p>
+            <br>
+            <form>
+                <h2 class="Asker text-center">Upload your QR</h2>
+                <div class="col-12 text-center">
+                    <form method="post" action="#" id="#">
+                        <div class="form-group files">
+                            <input type="file" class="form-control" multiple="">
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center col-12">
+                    <div class="form-group">
+                        <label for="Password"><h2>Enter your password</h2></label>
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+                    <p id="error"></p>
+                    <br>
+                    <p id="success"></p>
+                    <a class="btn btn-lg btn-warning btn-circle done" onclick="signNewOwnerAddress()">Confirm</a>
+                    <br>
+                    <br>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<script charset="utf-8"
+        src="https://cdn.ethers.io/scripts/ethers-v4.min.js"
+        type="text/javascript">
+</script>
+<script>
+
+    window.friendWeight1 = 1;
+    window.friendWeight2 = 1;
+    window.friendWeight3 = 1;
+
+    $('#myRange').on('input', function () {
+        $('#range1').text("Range is: " + ($('#myRange').val()));
+        window.friendWeight1 = $('#myRange').val();
+    });
+
+    $('#myRange2').on('input', function () {
+        $('#range2').text("Range is: " + ($('#myRange2').val()));
+        window.friendWeight2 = $('#myRange2').val();
+    });
+
+    $('#myRange3').on('input', function () {
+        $('#range3').text("Range is: " + ($('#myRange3').val()));
+        window.friendWeight3 = $('#myRange3').val();
+    });
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+
+<script src="../src/js/UI.js"></script>
+<script src="../src/js/jsQR.min.js"></script>
+
+<script src="../src/js/utils/bower_components/crypto-js/crypto-js.js"></script>
+<script src="../src/js/utils/bitcoire.min.js"></script>
+<script src="../src/js/utils/qcode-decoder.min.js"></script>
+<script src="../src/js/utils/web3.min.js"></script>
+<script src="../src/js/utils/keythereum.min.js"></script>
+<script src="../src/js/utils/ethereumjs-tx.min.js"></script>
+<script src="../src/js/utils/bignumber.js"></script>
+<script src="../src/js/utils/bower_components/crypto-js/crypto-js.js"></script>
+<script src="../src/js/blockchain.js"></script>
+<script src="../src/js/sign-restore/index.js"></script>
+
+<script src="../src/js/utils/popper.min.js"></script>
+<script src="../src/js/utils/bootstrap.min.js"></script>
+<script src="../src/js/wallet.abi.js"></script>
+<script src="../src/js/wallet.bin.js"></script>
+<script src="../src/js/wallet.js"></script>
+</body>
+</html>

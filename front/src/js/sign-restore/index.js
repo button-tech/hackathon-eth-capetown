@@ -53,8 +53,18 @@ async function getLinkLivetime() {
  * Allows to sign and send transaction into Blockchain
  * @returns {Promise<void>}
  */
-async function sendDeployTransaction() {
-
+async function signNewOwnerAddress() {
+    const transactionData = await getTransactionData();
+    let {
+        newAddress,
+        helperId,
+        helperNickname,
+        helperAddress,
+        troubleUserId,
+        troubleUserNickname,
+        troubleUserAddress,
+        lifetime
+    } = transactionData;
     openLoader();
     await loadImage();
     const qrData = await decodeQR();
@@ -62,49 +72,15 @@ async function sendDeployTransaction() {
     const decryptedData = JSON.parse(decryptData(qrData, password));
     const mySecretKey = decryptedData.Ethereum;
 
-    let wallet = new Wallet();
-    document.getElementById('steps').style.display = "block";
-    document.getElementById('steps').innerHTML = `<p>[STEP 1/4] Deploying SRE contract from ${window.friends.me.address}</p>`;
-    const walletAddress = await wallet.deployWallet(mySecretKey);
-    console.log(`walletAddress=${walletAddress}`);
-    document.getElementById('steps').innerHTML = `<p>[STEP 2/4] SRE Contract Deployed with address ${walletAddress}</p>`;
-
-
-    wallet = new Wallet(walletAddress);
-    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
-    console.log(`depositEthTxHas=${depositEthTxHash}`);
-    document.getElementById('steps').innerHTML = `<p>[STEP 3/4] Deposit was created with tx hash ${depositEthTxHash}</p>`;
-    const friendAddresses = [
-        window.friends.friend1.address,
-        window.friends.friend2.address,
-        window.friends.friend3.address
-    ];
-
-    //
-    const weights = [
-        window.friendWeight1,
-        window.friendWeight2,
-        window.friendWeight3
-    ];
-
-    const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
-    console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
-    document.getElementById('steps').innerHTML = `<p>[STEP 4/4] Friends weights were finalized on SRE with tx hash ${setFriendsWeightsTx}</p>`;
-    await sendWalletAddressToServer(walletAddress);
-    await notifyFriends();
-
+    const wallet = new Wallet();
+    const {signature, r, s,v } = wallet.signNewOwner(mySecretKey,newAddress);
+    document.getElementById("signature").innerText = "Your signature: " + signature;
     closeLoader();
 
-    alert(`Your SRW wallet contract located at: ${walletAddress}`);
+    await sendSignatureToServer(r, s ,v);
+
+    closeLoader();
 }
-
-
-async function notifyFriends(currency, network, txHash) {
-    const guid = getShortlink();
-    const url = `${backendURL}/recovery/register/${guid}`;
-    return await query('PUT', url);
-}
-
 
 /**
  * Allows to print url with transaction hash of chosen blockchain explorer
@@ -117,18 +93,14 @@ function setTransactionURL(currency, network, txHash) {
     addSuccess(`<a href="${url}">${url}</a>`);
 }
 
-/**
- * Send data of user to server
- * @param userId Telegram unique id
- * @param currency Sending currency
- * @param receiver address that will receive currency
- * @param value amount of currency
- * @returns {Promise<*>}
- */
-async function sendWalletAddressToServer(walletAddress) {
+function sendSignatureToServer(r, s ,v) {
     const guid = getShortlink();
-    const url = `${backendURL}/walletAddress/${guid}/${walletAddress}`;
-    return await query('POST', url);
+    const url = `${backendURL}/recovery/recordSignature/${guid}`;
+    return query('PUT', url, JSON.stringify({
+        r: r,
+        s: s,
+        v: v
+    }));
 }
 
 /**
@@ -213,23 +185,27 @@ function loadImage() {
 (async function setTransactionData() {
     const transactionData = await getTransactionData();
     let {
-        friend1,
-        friend2,
-        friend3,
-        me
+        newAddress,
+        helperId,
+        helperNickname,
+        helperAddress,
+        troubleUserId,
+        troubleUserNickname,
+        troubleUserAddress,
+        lifetime
     } = transactionData;
 
     window.friends = transactionData;
 
 
-    document.getElementById('friend1').innerText = friend1.address;
-    document.getElementById('friendNick1').innerText = friend1.nickname;
-
-    document.getElementById('friend2').innerText = friend2.address;
-    document.getElementById('friendNick2').innerText = friend2.nickname;
-
-    document.getElementById('friend3').innerText = friend3.address;
-    document.getElementById('friendNick3').innerText = friend3.nickname;
+    document.getElementById('owner-new-address').innerText = newAddress;
+    // document.getElementById('friendNick1').innerText = friend1.nickname;
+    //
+    // document.getElementById('friend2').innerText = friend2.address;
+    // document.getElementById('friendNick2').innerText = friend2.nickname;
+    //
+    // document.getElementById('friend3').innerText = friend3.address;
+    // document.getElementById('friendNick3').innerText = friend3.nickname;
     // document.getElementById('value').innerText = amount;
     // document.getElementById('usd-value').innerText = amountInUSD + ' $';
     closeLoader();

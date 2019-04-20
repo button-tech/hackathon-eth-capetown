@@ -1,4 +1,5 @@
 const db = require('../../shared/db/db');
+const Text = require('../../shared/text');
 const redis = require('../../shared/redis/redis');
 const telegram = require('../../shared/messangers/telegram');
 const Keyboard = require('../../shared/keyboard/keyboard');
@@ -185,27 +186,31 @@ async function createNewAccount(req, res) {
 
             const user = await db.user.find.oneByID(value.userID);
 
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < user.friendsForRestore.length; i++) {
 
                 const key = guid.create().value;
 
                 const friend = await db.user.find.oneByID(user.friendsForRestore[i]);
 
-                const value = JSON.stringify({
+                const newValue = JSON.stringify({
+                    newAddress: ethereumAddress,
                     helperId: friend.userID,
                     helperNickname: friend.nickname,
                     helperAddress: friend.ethereumAddress,
                     troubleUserId: user.userID,
                     troubleUserNickname: user.nickname,
                     troubleUserAddress: user.ethereumAddress,
-                    lifetime: Date.now() + (utils.keyLifeTime * 1000),
+                    lifetime: Date.now() + (600 * 1000),
                 });
 
-                redis.setData(key, value, value.lifetime);
+                redis.setData(key, newValue, (600 * 1000));
 
-                await telegram.sendInlineButton(user.friendsForRestore[i],
-                    `Your friend ${user.nickname} lost hist QR. Pls help him restore it`, "Help",
-                    `/restore/?restore=${key}`);
+                console.log(Text.inline_keyboard.save_money["2"].callback+key);
+
+                const res = await telegram.sendInlineButton(user.friendsForRestore[i],
+                    `Your friend @${user.nickname} lost hit QR. Pls help him restore it`, "Help",
+                    Text.inline_keyboard.save_money["2"].callback+key);
+                console.log(res)
             }
 
             redis.deleteData(id);
@@ -216,7 +221,7 @@ async function createNewAccount(req, res) {
         })
         .catch(e => {
             res.send({
-                error: e.message,
+                error: e,
                 result: null
             });
         })
@@ -237,7 +242,7 @@ function recordSignature(req, res) {
 
             telegram.sendMessageWithoutKeyboard(value.troubleUserId, `You supported by @${value.helperNickname}!`);
 
-            if (troubleUser.friendsSignatures.r.length === 3) {
+            if (troubleUser.friendsSignatures.r.length >= 3) {
                 // const key = guid.create().value;
 
                 await telegram.sendInlineButtonCallbackType(value.troubleUserId,
@@ -257,7 +262,7 @@ function recordSignature(req, res) {
                 //     `All of your friends approved friend`, "NICE",
                 //     `/moveOwner/?moveOwner=${key}`);
 
-                redis.deleteData(id);
+                // redis.deleteData(id);
                 res.send({
                     error: null,
                     result: 'success'

@@ -7,6 +7,7 @@ Text.inline_keyboard.create_wallet["0"].callback = domainName + Text.inline_keyb
 Text.inline_keyboard.send_transaction["0"].callback = domainName + Text.inline_keyboard.send_transaction["0"].callback;
 Text.inline_keyboard.save_money["0"].callback = domainName + Text.inline_keyboard.save_money["0"].callback;
 Text.inline_keyboard.save_money["2"].callback = domainName + Text.inline_keyboard.save_money["2"].callback;
+Text.inline_keyboard.save_money["3"].callback = domainName + Text.inline_keyboard.save_money["3"].callback;
 
 const start = [
     [Text.keyboard.start.button["0"], Text.keyboard.start.button["1"]],
@@ -64,7 +65,11 @@ const save_money  = (guid) => Markup.inlineKeyboard([
 ]);
 
 const restore_acc = (guid) => Markup.inlineKeyboard([
-    Markup.urlButton(Text.inline_keyboard.restore_acc["0"].button, `${Text.inline_keyboard.restore_acc["0"].callback}${guid}`),
+    Markup.urlButton(Text.inline_keyboard.save_money["3"].button, `${Text.inline_keyboard.save_money["3"].callback}${guid}`),
+]);
+
+const help = (guid) => Markup.inlineKeyboard([
+    Markup.urlButton(Text.inline_keyboard.save_money["2"].button, `${Text.inline_keyboard.save_money["2"].callback}${guid}`),
 ]);
 
 module.exports = {
@@ -79,6 +84,7 @@ module.exports = {
     getFriendsButtons:getFriendsButtons,
     selectOtherFriends: selectOtherFriends,
     startRegistredForBackup: startRegistredForBackup,
-    chooseTransfer: chooseTransfer
+    chooseTransfer: chooseTransfer,
+    help: help
 };
 

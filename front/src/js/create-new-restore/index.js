@@ -1,243 +1,255 @@
 const BL = new Blockchain();
-
 /**
  * Start timer
  * @param duration {Number} timer time in minutes
  * @param display body block
  */
+function startTimer(duration, display) {
+    let timer = duration, minutes, seconds;
+    const bomb = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (document.getElementById('loader').style.display == '')
+            closeLoader();
+
+        if (--timer < 0) {
+            addError('The link was deleted');
+            clearInterval(bomb)
+        }
+    }, 1000);
+}
+
+(async () => {
+    checkPwd();
+    const deleteDate = await getLinkLivetime();
+    const now = Date.now();
+    const difference = Number(deleteDate) - now;
+    if (difference <= 0) {
+        addError('The link was deleted or not found');
+        throw new Error('Can not get livetime of link');
+    }
+    const differenceInMinute = difference / 1000 / 60;
+    const minutes = 60 * differenceInMinute,
+        display = document.querySelector('#time');
+    startTimer(minutes, display);
+})();
 
 /**
  * Allows to get livetime of link
  * @returns {Promise<String>}
  */
 async function getLinkLivetime() {
-    const guid = getShortlink();
+    const link = getShortlink();
     try {
-        const response = await query('GET', `${backendURL}/guid/lifetime/${guid}`);
+        const response = await query('GET', `${backendURL}/guid/lifetime/${link}`);
+        console.log(response)
         if (response.error) {
             addError('Close page and try again');
             return response.error;
-        } else
-            return new Date(response.result).getTime();
+        }
+
+        return new Date(response.result).getTime();
     } catch (e) {
+
+        console.log(e);
+
         addError('The link was deleted or not found');
         throw new Error('Can not get livetime of link');
     }
 }
 
 /**
- * Allows to sign and send transaction into Blockchain
+ * Generate QR code with encrypted private keys
  * @returns {Promise<void>}
  */
-async function sendDeployTransaction() {
+async function generatePicture() {
+    const privateKeys = getAllPrivateKeys();
+    const addresses = getAllAddresses(privateKeys);
+
+    const password = checkPassword('password1', 'password2', 'error');
+
+    if (!password)
+        return;
+
+    const encrypted = encryptAccount(privateKeys, password);
 
     openLoader();
-    await loadImage();
-    const qrData = await decodeQR();
-    const password = getPassword();
-    const decryptedData = JSON.parse(decryptData(qrData, password));
-    const mySecretKey = decryptedData.Ethereum;
-    const myPublicKey = window.friends.me.address;
 
-    const wallet = new Wallet(myPublicKey);
-
-    const walletAddress = await wallet.deployWallet(mySecretKey);
-    console.log(`walletAddress=${walletAddress}`);
-
-    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
-    console.log(`depositEthTxHas=${depositEthTxHash}`);
-
-    const friendAddresses = [
-        window.friends.friend1.address,
-        window.friends.friend2.address,
-        window.friends.friend3.address
-    ];
-
-    //
-    const weights = [
-        window.friendWeight1,
-        window.friendWeight2,
-        window.friendWeight3
-    ];
-
-    const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
-    console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
-    await sendWalletAddressToServer(walletAddress);
-    await notifyFriends();
-
-    closeLoader();
-
-    alert(`Your SRW wallet contract located at: ${walletAddress}`);
-}
-
-
-async function notifyFriends(currency, network, txHash) {
-    const guid = getShortlink();
-    const url = `${backendURL}/recovery/register/${guid}`;
-    return await query('PUT', url);
-}
-
-
-/**
- * Allows to print url with transaction hash of chosen blockchain explorer
- * @param currency Chosen currency
- * @param network testnet or mainnet
- * @param txHash Hash of transaction
- */
-function setTransactionURL(currency, network, txHash) {
-    const url = explorers[currency][network] + txHash;
-    addSuccess(`<a href="${url}">${url}</a>`);
-}
-
-/**
- * Send data of user to server
- * @param userId Telegram unique id
- * @param currency Sending currency
- * @param receiver address that will receive currency
- * @param value amount of currency
- * @returns {Promise<*>}
- */
-async function sendWalletAddressToServer(walletAddress) {
-    const guid = getShortlink();
-    const url = `${backendURL}/walletAddress/${guid}/${walletAddress}`;
-    return await query('POST', url);
-}
-
-/**
- * Allows to get user password to decrypt cipher text
- * @returns {String} password
- */
-function getPassword() {
-    const password = document.getElementById('password').value;
-    if (password == '')
-        addHint('You do not enter password');
-    else
-        return password;
-}
-
-/**
- * Allows to decrypt data from QR code
- * @param cipher QR code data
- * @param password password
- * @returns {String} decrypted data
- */
-function decryptData(cipher, password) {
-    if (!password) {
-        addHint('Enter password');
-        throw Error('Enter password');
-    }
-
-    try {
-        const bytes = CryptoJS.AES.decrypt(cipher, password);
-        const data = bytes.toString(CryptoJS.enc.Utf8);
-
-        if (data)
-            return data;
-        else
-            throw Error('Incorrect QR Code or password');
-    } catch (e) {
-        throw Error('Incorrect QR Code or password')
-    }
-}
-
-/**
- * Allows to get QR code data
- * @param qrCode IMG selector data
- * @return Cipher text
- */
-function decodeQR() {
-    return new Promise((resolve, reject) => {
-        const img = document.getElementById("qrImage");
-        const canvasElement = document.getElementById('canvas');
-        const ctx = canvasElement.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvasElement.width, canvasElement.height);
-
-        const imageData = ctx.getImageData(0, 0, canvasElement.width, canvasElement.height);
-        const encodedData = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
-        });
-
-        encodedData ? resolve(encodedData.data) : reject(false)
-    });
-}
-
-/**
- * Allows to get file
- */
-function loadImage() {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        const file = document.querySelector("input[type=file]").files[0];
-        if (!file) {
-            resolve(false);
-        }
-
-        reader.readAsDataURL(file);
-        reader.onload = function () {
-            document.getElementById("qrImage").src = reader.result;
-            document.getElementById("qrImage").onload = () => {
-                resolve(true)
-            };
-        }
-    });
-}
-
-(async function setTransactionData() {
-    const transactionData = await getTransactionData();
-    debugger
-    // let {
-    //     friend1,
-    //     friend2,
-    //     friend3,
-    //     me
-    // } = transactionData;
-    //
-    // window.friends = transactionData;
-    //
-    //
-    // document.getElementById('friend1').innerText = friend1.address;
-    // document.getElementById('friendNick1').innerText = friend1.nickname;
-    //
-    // document.getElementById('friend2').innerText = friend2.address;
-    // document.getElementById('friendNick2').innerText = friend2.nickname;
-    //
-    // document.getElementById('friend3').innerText = friend3.address;
-    // document.getElementById('friendNick3').innerText = friend3.nickname;
-    // // document.getElementById('value').innerText = amount;
-    // // document.getElementById('usd-value').innerText = amountInUSD + ' $';
-    // closeLoader();
-    //
-    // const deleteDate = await getLinkLivetime();
-    // const now = Date.now();
-    // const difference = Number(deleteDate) - now;
-    // if (difference <= 0) {
-    //     addError('The link was deleted or not found');
-    //     throw new Error('Can not get livetime of link');
-    // }
-    // //const differenceInMinute = difference / 1000 / 60;
-    // //const minutes = 60 * differenceInMinute,
-    // //elem = document.querySelector('#time');
-    // // startTimer(minutes, elem);
-})();
-
-/**
- * Allows to get transaction properties
- * @returns {Object} Transaction properties
- */
-async function getTransactionData() {
     const shortlink = getShortlink();
 
+    await sendAddresses(addresses, shortlink);
+
+    document.getElementById('main').innerHTML = `
+        <div class="container text-center">
+            <br>
+            <br>
+            <h1>You are all set! This is your new QR code</h1>
+            <br>
+            <h5>Wait until your friends confirm your identity</h5>
+            <br>
+            <br>
+            <img id="qr">
+            <br>
+            <br>
+            <p id="save-qr-code"></p>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <h1>Here you can see your ETH public address</h1>
+                <br>
+                <br>
+                <p style="font-size: 22px; word-wrap: break-word">ETH: ${addresses["Ethereum"]}</p>
+            </div>
+        </div>
+    `;
+
+    createQRCode('qr', encrypted);
+    addSaveButton();
+
+    closeLoader();
+}
+
+/**
+ * Allows to send user's addresses to backend
+ * @param addresses {Object} user's addresses
+ * @param shortlink {String} guid
+ * @returns {Promise<*>}
+ */
+async function sendAddresses(addresses, guid) {
+    const queryURL = `${backendURL}/recovery/create/${guid}`;
+    const data = {
+        ethereumAddress: addresses["Ethereum"],
+    };
     try {
-        const queryURL = `${backendURL}/guid/data/${shortlink}`;
-        const response = await query('GET', queryURL);
-        console.log(response)
-        if (response.error == null)
-            return response.result;
-        else {
-            throw response.error;
-        }
+        const response = await query('PUT', queryURL, JSON.stringify(data));
+        return response;
+        if (response.error != null)
+            throw new Error('Can not send address to data base');
     } catch (e) {
-        addError('Can not get transaction properties');
+        addError('Please, try again');
+        return e;
+    }
+
+}
+
+/**
+ * Create and push QR Code to tag
+ * @param tagForQR {String} id of tag
+ * @param data {String} QR code data
+ */
+function createQRCode(tagForQR, data) {
+    (function () {
+        const qr = new QRious({
+            element: document.getElementById(tagForQR),
+            value: data
+        });
+        qr.size = 300;
+    })();
+}
+
+/**
+ * Add button. Push button and save qr code
+ * @param data
+ */
+function addSaveButton() {
+    const image = document.getElementById('qr');
+    document.getElementById('save-qr-code').innerHTML = `<a href="${image.src}" download="ButtonWallet.png"><button class="btn btn-success">Download</button></a>`;
+}
+
+/**
+ * Allows to encrypt user's privateKeys via his password
+ * @param privateKeys {Object} user's private keys
+ * @param password {String} encryption key
+ * @returns {string} cypher text
+ */
+function encryptAccount(privateKeys, password) {
+    if (password == '')
+        throw new Error('Enter password');
+    const encrypted = CryptoJS.AES.encrypt(JSON.stringify(privateKeys), password);
+    return encrypted.toString();
+}
+
+/**
+ * Check password for wrong values
+ * @param passwordElemID id of tag with password
+ * @param errorElemID id of tag with error
+ * @returns {boolean} true|false
+ */
+function checkPassword(passwordElemID, repeatPasswordElemID, errorElemID) {
+    const password = document.getElementById(passwordElemID).value;
+    const repeatPassword = document.getElementById(repeatPasswordElemID).value;
+
+    const checkObject = {
+        0: {
+            check: password != '',
+            errorMessage: 'Enter password'
+        },
+        1: {
+            check: password.length >= 8,
+            errorMessage: 'Password should be equal or more than 8 characters'
+        },
+        // 2: {
+        //     check: RegExp(/(?=.*[!@#$%^&*])/).test(password),
+        //     errorMessage: 'The password must contain special characters'
+        // },
+        2: {
+            check: RegExp(/[0-9]/).test(password),
+            errorMessage: 'The password must contains numbers'
+        },
+        3: {
+            check: RegExp(/(?=.*[a-z])(?=.*[A-Z])/).test(password),
+            errorMessage: 'The password must contains Latin letters of different registers'
+        },
+        4: {
+            check: password === repeatPassword,
+            errorMessage: 'Passwords do not match'
+        }
+    }
+
+    let err= false;
+    for (let i in checkObject) {
+        if (!checkObject[i].check) {
+            err = true;
+            $(`#${errorElemID}`).text(`${checkObject[i].errorMessage}`);
+            break;
+        } {
+            $(`#${errorElemID}`).text(``);
+        }
+    }
+
+    return err == false ? password : false;
+}
+
+/**
+ * Allows to get user's addresses from his private keys
+ * @param privateKeys {Object} user's private keys
+ */
+function getAllAddresses(privateKeys) {
+    return {
+        "Ethereum": BL.getAddress(privateKeys["Ethereum"]),
+    };
+}
+
+/**
+ * Allows to get user's private keys
+ * @returns {{Waves: Object, Ethereum: (string), Bitcoin: (string), BitcoinCash: (string), Litecoin: (string)}}
+ */
+function getAllPrivateKeys() {
+    const ethereum = BL.getPrivateKey();
+
+    return {
+        Ethereum: ethereum,
     }
 }
 
@@ -247,15 +259,14 @@ async function getTransactionData() {
  */
 function getShortlink() {
     const demand = ['guid'];
-
     const url = window.location;
     const urlData = parseURL(url);
+    console.log(urlData);
 
     demand.forEach((property) => {
-        if (urlData[property] === undefined) {
-            addError('Transaction do not contains all parameters');
+        if (urlData[property] === undefined)
             throw new Error('URL doesn\'t contain all properties');
-        }
+
     });
 
     return urlData.guid;
@@ -276,3 +287,4 @@ function parseURL(url) {
         throw e;
     }
 }
+
