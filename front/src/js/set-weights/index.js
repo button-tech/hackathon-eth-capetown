@@ -72,7 +72,7 @@ async function sendDeployTransaction() {
 
 
     wallet = new Wallet(walletAddress);
-    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.1);
+    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.01);
     console.log(`depositEthTxHas=${depositEthTxHash}`);
     document.getElementById('steps').innerHTML = `<p>[STEP 3/4] Deposit was created with tx hash ${depositEthTxHash}</p>`;
     const friendAddresses = [
