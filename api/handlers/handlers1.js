@@ -227,6 +227,29 @@ async function createNewAccount(req, res) {
         })
 }
 
+async function getSignatures(req, res) {
+    const id = req.params.guid;
+
+    redis.getData(id)
+        .then(async value => {
+
+            value = JSON.parse(value);
+
+            const troubleUser = await db.user.find.oneByID(value.troubleUserId);
+            res.send({
+                error: null,
+                result: troubleUser.friendsSignatures
+            });
+
+        })
+        .catch(e => {
+            res.send({
+                error: e.message,
+                result: null
+            });
+        });
+}
+
 function recordSignature(req, res) {
     const id = req.params.guid;
     const {r, s, v} = req.body;
@@ -287,5 +310,6 @@ module.exports = {
     createNewAccount: createNewAccount,
     recover: recover,
     recordSignature: recordSignature,
-    recordWalletAddress: recordWalletAddress
+    recordWalletAddress: recordWalletAddress,
+    getSignatures: getSignatures
 };

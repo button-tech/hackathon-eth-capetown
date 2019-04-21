@@ -57,13 +57,15 @@ async function signNewOwnerAddress() {
     const transactionData = await getTransactionData();
     let {
         newAddress,
-        helperId,
-        helperNickname,
-        helperAddress,
-        troubleUserId,
-        troubleUserNickname,
-        troubleUserAddress,
-        lifetime
+        // helperId,
+        // helperNickname,
+        // helperAddress,
+        // troubleUserId,
+        // troubleUserNickname,
+        // troubleUserAddress,
+        // lifetime,
+        thirdFriends,
+        recoveryAddress,
     } = transactionData;
     openLoader();
     await loadImage();
@@ -71,13 +73,18 @@ async function signNewOwnerAddress() {
     const password = getPassword();
     const decryptedData = JSON.parse(decryptData(qrData, password));
     const mySecretKey = decryptedData.Ethereum;
-
     const wallet = new Wallet();
     const {signature, r, s,v } = wallet.signNewOwner(mySecretKey,newAddress);
     document.getElementById("signature").innerText = "Your signature: " + signature;
     closeLoader();
-
     await sendSignatureToServer(r, s ,v);
+
+
+
+    if(thirdFriends) {
+        const response = await query('GET', `${backendURL}/signatures/${guid}`);
+        await wallet.moveOwner(mySecretKey, recoveryAddress, response.r, response.s, response.v);
+    }
 
     closeLoader();
 }
