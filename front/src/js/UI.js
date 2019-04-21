@@ -1,6 +1,6 @@
 // const backendURL = 'https://capetown.buttonwallet.com/api';
 //const backendURL = 'http://localhost:3000/api';
-const backendURL = 'https://be574b0e.ngrok.io';
+const backendURL = 'https://be574b0e.ngrok.io/api';
 
 const explorers = {
     "Ethereum": {
