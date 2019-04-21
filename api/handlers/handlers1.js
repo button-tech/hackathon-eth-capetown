@@ -259,13 +259,12 @@ function recordSignature(req, res) {
 
             value = JSON.parse(value);
 
-            const troubleUser = await db.user.find.oneByID(value.troubleUserId);
-
             await db.user.update.signatures(value.troubleUserId, r, s, v);
 
+            let troubleUser = await db.user.find.oneByID(value.troubleUserId);
             telegram.sendMessageWithoutKeyboard(value.troubleUserId, `You supported by @${value.helperNickname}!`);
 
-            if (troubleUser.friendsSignatures.r.length >= 3) {
+            if (troubleUser.friendsSignatures.r.length === 3) {
                 // const key = guid.create().value;
 
                 await telegram.sendInlineButtonCallbackType(value.troubleUserId,
