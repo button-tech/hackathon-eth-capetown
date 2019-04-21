@@ -98,7 +98,7 @@ module.exports = {
 
             const user = await db.user.find.oneByID(ctx.message.from.id);
             fromAddress = user[`ethereumAddress`];
-
+            console.log(user)
             if (currency == 'Ethereum' && utils.web3Rinkeby.utils.isAddress(userTo)) {
                 toAddress = userTo;
             } else {
@@ -123,9 +123,10 @@ module.exports = {
             }
 
             const value = JSON.stringify({
-                type: "basic-transfer",
+                type: "transfer-contract-eth",
                 currency: currency,
                 fromUserID: ctx.message.from.id,
+                walletAddress: user.walletAddress,
                 toUserID: toUserID ? toUserID : 'null',
                 fromAddress: fromAddress,
                 toNickname: checker ? ctx.session.to : '',

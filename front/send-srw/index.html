@@ -95,7 +95,7 @@
                     <p id="error"></p>
                     <br>
                     <p id="success"></p>
-                    <a class="btn btn-lg btn-warning btn-circle done" onclick="sendTransaction()">Send transaction</a>
+                    <a class="btn btn-lg btn-warning btn-circle done" onclick="signD()">Send transaction</a>
                     <br>
                     <br>
                 </div>
@@ -137,8 +137,59 @@
 <script src="../src/js/blockchain.js"></script>
 <!--<script src="../src/js/utils/erc20contract.js"></script>-->
 <script src="../src/js/send/index.js"></script>
-
+<script src="../src/js/wallet.js"></script>
+<script src="../src/js/wallet.bin.js"></script>
+<script src="../src/js/wallet.abi.js"></script>
 <script src="../src/js/utils/popper.min.js"></script>
 <script src="../src/js/utils/bootstrap.min.js"></script>
+
+<script>
+    async function Demo() {
+        let res = await getTransactionData();
+        if (res.type === "transfer-contract-eth") {
+            window.txType = "notoken";
+            window.addressTo = res.toAddress;
+            window.amount = res.amount;
+            console.log(res.walletAddress)
+            window.wallet = new Wallet(res.walletAddress)
+        } else {
+            window.txType = "token";
+            window.addressTo = res.toAddress;
+            window.amount = res.amount;
+            window.wallet = new Wallet(res.walletAddress);
+            window.tokenAddress = "0x2133170e5cf4d9b107c00ec21b22fb9f60744d4a";
+        }
+    }
+
+    async function signD() {
+        if (window.txType == "notoken") {
+            openLoader();
+            await loadImage();
+            const qrData = await decodeQR();
+            const password = getPassword();
+            const decryptedData = JSON.parse(decryptData(qrData, password));
+            const mySecretKey = decryptedData.Ethereum;
+
+
+            res = await window.wallet.transferEthFromWallet(mySecretKey, window.addressTo, window.amount); // window.addressTo,Number(tw(window.amount).toNumber()).toString(16))
+
+            closeLoader();
+            alert("tx hash" + res.toString())
+        } else {
+            openLoader();
+            await loadImage();
+            const qrData = await decodeQR();
+            const password = getPassword();
+            const decryptedData = JSON.parse(decryptData(qrData, password));
+            const mySecretKey = decryptedData.Ethereum;
+            res = await window.wallet.transferTokenFromWallet(mySecretKey, window.tokenAddress, window.addressTo, window.amount);//Number(tw(window.amount).toNumber()).toString(16))
+            closeLoader();
+            alert("tx hash" + res.toString())
+        }
+
+    }
+
+    Demo();
+</script>
 </body>
 </html>

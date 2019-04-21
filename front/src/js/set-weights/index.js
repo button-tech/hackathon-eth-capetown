@@ -70,8 +70,8 @@ async function sendDeployTransaction() {
     document.getElementById('steps').innerHTML = `<p>[STEP 2/4] SRE Contract Deployed with address ${walletAddress}</p>`;
 
 
-    wallet = new Wallet(walletAddress);
-    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
+    wallet = new Wallet(walletAddress[0]);
+    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.1);
     console.log(`depositEthTxHas=${depositEthTxHash}`);
     document.getElementById('steps').innerHTML = `<p>[STEP 3/4] Deposit was created with tx hash ${depositEthTxHash}</p>`;
     const friendAddresses = [

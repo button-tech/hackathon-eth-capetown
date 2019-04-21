@@ -239,7 +239,6 @@ async function getTransactionData() {
     try {
         const queryURL = `${backendURL}/guid/data/${shortlink}`;
         const response = await query('GET', queryURL);
-        console.log(response)
         if (response.error == null)
             return response.result;
         else {

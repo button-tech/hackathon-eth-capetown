@@ -13,8 +13,10 @@ const toHexWeiString = (amount) => "0x"+(amount*10**18).toString(16)
 class Wallet {
 
     constructor(address) {
-        this.wallet = getInstance(wallet_abi, address);
-        this.walletAddress = address;
+        if(address){
+            this.wallet = getInstance(wallet_abi, address);
+            this.walletAddress = address;
+        }
     }
 
     // return: new contract address
@@ -75,8 +77,8 @@ class Wallet {
                     );
 
                     resolve(addWeightUpdateRequest);
-                }, 20000);
-            }, 20000);
+                }, 25000);
+            }, 25000);
         });
 
         const addWeightUpdateRequest = await p;

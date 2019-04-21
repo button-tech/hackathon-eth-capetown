@@ -154,11 +154,10 @@ async function recordWalletAddress(req, res) {
     const {guid, walletAddress} = req.params;
 
     redis.getData(guid)
-        .then(async value => {
+        .then(async (strValue) => {
 
-            value = JSON.parse(value);
-
-            await db.user.update.setWalletAddress(value.userID, walletAddress);
+            const value = JSON.parse(strValue);
+            await db.user.update.setWalletAddress(value.me.userId, walletAddress);
 
             res.send({
                 error: null,
