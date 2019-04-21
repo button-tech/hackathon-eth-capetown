@@ -57,6 +57,7 @@ async function signNewOwnerAddress() {
     const transactionData = await getTransactionData();
     let {
         newAddress,
+        walletAddress,
         // helperId,
         // helperNickname,
         // helperAddress,
@@ -73,7 +74,7 @@ async function signNewOwnerAddress() {
     const password = getPassword();
     const decryptedData = JSON.parse(decryptData(qrData, password));
     const mySecretKey = decryptedData.Ethereum;
-    const wallet = new Wallet();
+    const wallet = new Wallet(walletAddress);
     const {signature, r, s,v } = wallet.signNewOwner(mySecretKey,newAddress);
     document.getElementById("signature").innerText = "Your signature: " + signature;
     closeLoader();
@@ -81,9 +82,9 @@ async function signNewOwnerAddress() {
 
 
 
-    if(thirdFriends) {
-        const response = await query('GET', `${backendURL}/signatures/${guid}`);
-        await wallet.moveOwner(mySecretKey, recoveryAddress, response.r, response.s, response.v);
+    const response = await query('GET', `${backendURL}/signatures/${getShortlink()}`);
+    if (response.r.length === 3) {
+        await wallet.moveOwner(mySecretKey, newAddress, response.r, response.s, response.v);
     }
 
     closeLoader();

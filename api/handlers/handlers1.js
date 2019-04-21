@@ -193,6 +193,7 @@ async function createNewAccount(req, res) {
                 const friend = await db.user.find.oneByID(user.friendsForRestore[i]);
 
                 const newValue = JSON.stringify({
+                    walletAddress: user.walletAddress,
                     newAddress: ethereumAddress,
                     helperId: friend.userID,
                     helperNickname: friend.nickname,

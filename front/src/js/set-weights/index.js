@@ -64,14 +64,14 @@ async function sendDeployTransaction() {
 
     let wallet = new Wallet();
     document.getElementById('steps').style.display = "block";
-    document.getElementById('steps').innerHTML = `<p>[STEP 1/4] Deploying SRE contract from ${window.friends.me.address}</p>`;
+    document.getElementById('steps').innerHTML = `<p>[STEP 1/4] Deploying SRW contract from ${window.friends.me.address}</p>`;
     const walletAddress = await wallet.deployWallet(mySecretKey);
     console.log(`walletAddress=${walletAddress}`);
-    document.getElementById('steps').innerHTML = `<p>[STEP 2/4] SRE Contract Deployed with address ${walletAddress}</p>`;
+    document.getElementById('steps').innerHTML = `<p>[STEP 2/4] SRW Contract Deployed with address ${walletAddress}</p>`;
 
 
-    wallet = new Wallet(walletAddress);
-    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
+    const _wallet = new Wallet(walletAddress[0]);
+    const depositEthTxHash = await _wallet.depositEthToWallet(mySecretKey, 0.0005);
     console.log(`depositEthTxHas=${depositEthTxHash}`);
     document.getElementById('steps').innerHTML = `<p>[STEP 3/4] Deposit was created with tx hash ${depositEthTxHash}</p>`;
     const friendAddresses = [
@@ -87,15 +87,15 @@ async function sendDeployTransaction() {
         window.friendWeight3
     ];
 
-    const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
+    const setFriendsWeightsTx = await _wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
     console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
     document.getElementById('steps').innerHTML = `<p>[STEP 4/4] Friends weights were finalized on SRE with tx hash ${setFriendsWeightsTx}</p>`;
-    await sendWalletAddressToServer(walletAddress);
+    await sendWalletAddressToServer(walletAddress[0]);
     await notifyFriends();
 
     closeLoader();
 
-    alert(`Your SRW wallet contract located at: ${walletAddress}`);
+    alert(`Your SRW wallet contract located at: ${walletAddress[0]}`);
 }
 
 
@@ -127,7 +127,7 @@ function setTransactionURL(currency, network, txHash) {
  */
 async function sendWalletAddressToServer(walletAddress) {
     const guid = getShortlink();
-    const url = `${backendURL}/walletAddress/${guid}/${walletAddress}`;
+    const url = `${backendURL}/walletAddress/${walletAddress}/${guid}`;
     return await query('POST', url);
 }
 
