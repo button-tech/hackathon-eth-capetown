@@ -102,6 +102,28 @@ const user = {
                 });
             });
         },
+        setAddress : async (userID, address)=>{
+            return new Promise((resolve, reject) => {
+                User.updateOne({userID: userID}, {ethereumAddress: address}, (err, doc) => {
+                    if (err)
+                        reject(err);
+                    resolve(doc);
+                });
+            });
+        },
+        changeSRV : async (userID)=>{
+            return new Promise((resolve, reject) => {
+                User.updateOne({userID: userID}, {friendsSignatures: {
+                        r: [],
+                        s: [],
+                        v: []
+                    }}, (err, doc) => {
+                    if (err)
+                        reject(err);
+                    resolve(doc);
+                });
+            });
+        },
         signatures: async (userID, r, s, v) => {
             return new Promise((resolve, reject) => {
                 User.findOne({userID: Number(userID)}, (err, doc) => {

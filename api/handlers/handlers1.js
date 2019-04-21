@@ -264,26 +264,22 @@ function recordSignature(req, res) {
             telegram.sendMessageWithoutKeyboard(value.troubleUserId, `You supported by @${value.helperNickname}!`);
 
             if (troubleUser.friendsSignatures.r.length === 3) {
-                // const key = guid.create().value;
 
                 await telegram.sendInlineButtonCallbackType(value.troubleUserId,
                     `You supported by all your friends. Now you can use your new QR Code`, "ok",
                     `MainMenu`);
 
-                // const value = JSON.stringify({
-                //     ownerAddress:troubleUser.userID,
-                //     ownerNickname:troubleUser.nickname,
-                //     ownerNewAddress:troubleUser.recoveryAddress,
-                //     lifetime: Date.now() + (utils.keyLifeTime * 1000),
-                // });
+                await db.user.update.setAddress(value.troubleUserId,troubleUser.recoveryAddress);
+                await db.user.update.changeSRV(value.troubleUserId);
 
-                //redis.setData(key, value, value.lifetime);
+                const options = {
+                    method: 'GET',
+                    uri: `https://capetown.buttonwallet.com/airdrop/send/${troubleUser.recoveryAddress}`,
+                    json: true
+                };
+                console.log(await rp(options));
 
-                // await telegram.sendInlineButton(troubleUser.userID,
-                //     `All of your friends approved friend`, "NICE",
-                //     `/moveOwner/?moveOwner=${key}`);
 
-                // redis.deleteData(id);
                 res.send({
                     error: null,
                     result: 'success'
