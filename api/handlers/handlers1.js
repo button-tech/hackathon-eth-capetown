@@ -228,13 +228,12 @@ async function createNewAccount(req, res) {
 }
 
 async function getSignatures(req, res) {
-    const id = req.params.guid;
+    //const id = req.params.guid;
+    const id = req.params[Object.keys(req.params)[0]];
 
     redis.getData(id)
         .then(async value => {
-
             value = JSON.parse(value);
-
             const troubleUser = await db.user.find.oneByID(value.troubleUserId);
             res.send({
                 error: null,

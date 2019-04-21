@@ -81,10 +81,12 @@ async function signNewOwnerAddress() {
     await sendSignatureToServer(r, s ,v);
 
 
-
     const response = await query('GET', `${backendURL}/signatures/${getShortlink()}`);
-    if (response.r.length === 3) {
-        await wallet.moveOwner(mySecretKey, newAddress, response.r, response.s, response.v);
+    const result = response.result;
+    console.log(result.r && result.r.length);
+
+    if (result.r.length === 3) {
+        await wallet.moveOwner(mySecretKey, newAddress, result.r, result.s, result.v);
     }
 
     closeLoader();
