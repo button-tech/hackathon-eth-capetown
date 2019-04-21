@@ -16,14 +16,13 @@
         "3": "➡ Pick / Change Friends"
       }
     },
-    "wallet":{
-      "button":{
+    "wallet": {
+      "button": {
         "0": "💵 Send",
         "1": "💵 Send SRW",
         "2": "🌀 Restore Access",
         "3": "⚡ Depoist",
         "4": "🚀 Withdraw"
-
       }
     }
   },
@@ -42,6 +41,13 @@
         "callback": "/send/?tx="
       }
     },
+    "srw_send_transaction": {
+      "text": "Tap the button to sign and send transaction",
+      "0": {
+        "button": "🖋 Send money",
+        "callback": "/send-srw/?tx="
+      }
+    },
     "save_money": {
       "text": "Open this link in browser to create social recovery wallet (SRW). Set weights from 1 to 10 for friends",
       "0": {
@@ -56,8 +62,8 @@
         "button": "Help",
         "callback": "/sign-restore/?guid="
       },
-      "err":{
-        "notThreeFriends":"Sorry, but you can add only 3 friends",
+      "err": {
+        "notThreeFriends": "Sorry, but you can add only 3 friends",
         "notReg": "This friend not register in bot"
       }
     }
@@ -76,6 +82,6 @@
       "3": "Enter third friend's nickname without @",
       "4": "Waiting for friends acceptance"
     }
-},
+  },
   "back": "❌ Back"
 }

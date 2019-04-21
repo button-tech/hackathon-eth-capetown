@@ -5,6 +5,8 @@ const domainName = process.env.DOMAIN_NAME ? process.env.DOMAIN_NAME : "http://1
 
 Text.inline_keyboard.create_wallet["0"].callback = domainName + Text.inline_keyboard.create_wallet["0"].callback;
 Text.inline_keyboard.send_transaction["0"].callback = domainName + Text.inline_keyboard.send_transaction["0"].callback;
+Text.inline_keyboard.srw_send_transaction["0"].callback = domainName + Text.inline_keyboard.srw_send_transaction["0"].callback;
+
 Text.inline_keyboard.save_money["0"].callback = domainName + Text.inline_keyboard.save_money["0"].callback;
 Text.inline_keyboard.save_money["2"].callback = domainName + Text.inline_keyboard.save_money["2"].callback;
 
@@ -14,7 +16,7 @@ const start = [
 
 const wallet = [
     [Text.keyboard.wallet.button["0"], Text.keyboard.wallet.button["1"]],
-    [Text.keyboard.wallet.button["2"], Text.keyboard.wallet.button["3"],Text.keyboard.wallet.button["4"]],
+    [Text.keyboard.wallet.button["2"], Text.keyboard.wallet.button["3"], Text.keyboard.wallet.button["4"]],
     [Text.back]
 ];
 
@@ -25,7 +27,7 @@ const startRegistredForBackup = [
 ];
 
 const account = [
-    [Text.keyboard.account.button["0"],Text.keyboard.account.button["1"]],
+    [Text.keyboard.account.button["0"], Text.keyboard.account.button["1"]],
     [Text.keyboard.account.button["2"], Text.keyboard.account.button["3"]],
     [Text.back]
 ];
@@ -55,11 +57,15 @@ const create_wallet = (guid) => Markup.inlineKeyboard([
     Markup.urlButton(Text.inline_keyboard.create_wallet["0"].button, `${Text.inline_keyboard.create_wallet["0"].callback}${guid}`),
 ]);
 
-const create_transaction  = (guid) => Markup.inlineKeyboard([
+const create_transaction = (guid) => Markup.inlineKeyboard([
     Markup.urlButton(Text.inline_keyboard.send_transaction["0"].button, `${Text.inline_keyboard.send_transaction["0"].callback}${guid}`),
 ]);
 
-const save_money  = (guid) => Markup.inlineKeyboard([
+const srw_create_transaction = (guid) => Markup.inlineKeyboard([
+    Markup.urlButton(Text.inline_keyboard.srw_send_transaction["0"].button, `${Text.inline_keyboard.srw_send_transaction["0"].callback}${guid}`),
+]);
+
+const save_money = (guid) => Markup.inlineKeyboard([
     Markup.urlButton(Text.inline_keyboard.save_money["0"].button, `${Text.inline_keyboard.save_money["0"].callback}${guid}`),
 ]);
 
@@ -70,13 +76,14 @@ const restore_acc = (guid) => Markup.inlineKeyboard([
 module.exports = {
     start: start,
     account: account,
-    wallet:wallet,
+    wallet: wallet,
     restore_acc: restore_acc,
+    srw_create_transaction: srw_create_transaction,
     create_wallet: create_wallet,
     create_transaction: create_transaction,
     save_money: save_money,
-    back:back,
-    getFriendsButtons:getFriendsButtons,
+    back: back,
+    getFriendsButtons: getFriendsButtons,
     selectOtherFriends: selectOtherFriends,
     startRegistredForBackup: startRegistredForBackup,
     chooseTransfer: chooseTransfer

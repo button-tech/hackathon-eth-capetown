@@ -8,6 +8,7 @@ module.exports = {
     setContext: function() {
 
         PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.wallet.button["0"], "ChooseTransfer", true);
+        PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.wallet.button["1"], "SrwChooseTransfer", true);
         PageConstructor.setKeyboardButtonPageCallback(Text.keyboard.wallet.button["2"], "RecoverFunds", true);
 
         return async (ctx) => {
