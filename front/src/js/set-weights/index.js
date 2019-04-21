@@ -9,26 +9,26 @@ const BL = new Blockchain();
  * @param duration {Number} timer time in minutes
  * @param display body block
  */
-function startTimer(duration, display) {
-    let timer = duration, minutes, seconds;
-    const bomb = setInterval(function () {
-        minutes = parseInt(timer / 60, 10)
-        seconds = parseInt(timer % 60, 10);
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        display.textContent = minutes + ":" + seconds;
-
-        if (document.getElementById('loader').style.display == '')
-            closeLoader();
-
-        if (--timer < 0) {
-            addError('The link was deleted');
-            clearInterval(bomb)
-        }
-    }, 1000);
-}
+// function startTimer(duration, elem) {
+//     let timer = duration, minutes, seconds;
+//     const bomb = setInterval(function () {
+//         minutes = parseInt(timer / 60, 10)
+//         seconds = parseInt(timer % 60, 10);
+//
+//         minutes = minutes < 10 ? "0" + minutes : minutes;
+//         seconds = seconds < 10 ? "0" + seconds : seconds;
+//
+//         elem.textContent = minutes + ":" + seconds;
+//
+//         if (document.getElementById('loader').style.display == '')
+//             closeLoader();
+//
+//         if (--timer < 0) {
+//             addError('The link was deleted');
+//             clearInterval(bomb)
+//         }
+//     }, 1000);
+// }
 
 /**
  * Allows to get livetime of link
@@ -38,11 +38,10 @@ async function getLinkLivetime() {
     const guid = getShortlink();
     try {
         const response = await query('GET', `${backendURL}/guid/lifetime/${guid}`);
-        if (response.error){
+        if (response.error) {
             addError('Close page and try again');
             return response.error;
-        }
-        else
+        } else
             return new Date(response.result).getTime();
     } catch (e) {
         addError('The link was deleted or not found');
@@ -54,45 +53,58 @@ async function getLinkLivetime() {
  * Allows to sign and send transaction into Blockchain
  * @returns {Promise<void>}
  */
-async function sendTransaction() {
-    try {
-        openLoader();
-        await loadImage();
-        const qrData = await decodeQR();
-        const password = getPassword();
-        const decryptedData = JSON.parse(decryptData(qrData, password));
+async function sendDeployTransaction() {
 
-        const transactionData = await getTransactionData();
-        let {
-            currency,
-            toAddress,
-            amount,
-        } = transactionData;
+    openLoader();
+    await loadImage();
+    const qrData = await decodeQR();
+    const password = getPassword();
+    const decryptedData = JSON.parse(decryptData(qrData, password));
+    const mySecretKey = decryptedData.Ethereum;
 
-        let transactionHash;
+    let wallet = new Wallet();
+    document.getElementById('steps').style.display = "block";
+    document.getElementById('steps').innerHTML = `<p>[STEP 1/4] Deploying SRE contract from ${window.friends.me.address}</p>`;
+    const walletAddress = await wallet.deployWallet(mySecretKey);
+    console.log(`walletAddress=${walletAddress}`);
+    document.getElementById('steps').innerHTML = `<p>[STEP 2/4] SRE Contract Deployed with address ${walletAddress}</p>`;
 
-        if (currency == 'Ethereum') {
-            amount = tw(amount).toNumber();
-            let rawTx = (await BL.signTransaction(decryptedData[currency], toAddress, amount));
-            transactionHash = await BL.sendSigned(rawTx);
-        } else {
-            amount = tw(amount).toNumber();
-            const instance = getInstance(ABI, ADDRESSES[currency]);
-            transactionHash = (await BL.set(instance, 'transfer', decryptedData["Ethereum"], 0, [toAddress, "0x"+Number(amount).toString(16)]));
-            currency = "Ethereum";
-        }
 
-        console.log(transactionHash);
+    wallet = new Wallet(walletAddress);
+    const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.0005);
+    console.log(`depositEthTxHas=${depositEthTxHash}`);
+    document.getElementById('steps').innerHTML = `<p>[STEP 3/4] Deposit was created with tx hash ${depositEthTxHash}</p>`;
+    const friendAddresses = [
+        window.friends.friend1.address,
+        window.friends.friend2.address,
+        window.friends.friend3.address
+    ];
 
-        setTransactionURL(currency, 'testnet', transactionHash);
+    //
+    const weights = [
+        window.friendWeight1,
+        window.friendWeight2,
+        window.friendWeight3
+    ];
 
-        await sendTransactionDataToServer(transactionHash);
+    const setFriendsWeightsTx = await wallet.setFriendsWeights(mySecretKey, friendAddresses, weights);
+    console.log(`setFriendsWeightsTx=${setFriendsWeightsTx}`);
+    document.getElementById('steps').innerHTML = `<p>[STEP 4/4] Friends weights were finalized on SRE with tx hash ${setFriendsWeightsTx}</p>`;
+    await sendWalletAddressToServer(walletAddress);
+    await notifyFriends();
 
-        closeLoader();
-    } catch (e) {
-        addHint(e.message);
-    }
+    closeLoader();
+
+    alert(`Your SRW wallet contract located at: ${walletAddress}`);
 }
+
+
+async function notifyFriends(currency, network, txHash) {
+    const guid = getShortlink();
+    const url = `${backendURL}/recovery/register/${guid}`;
+    return await query('PUT', url);
+}
+
 
 /**
  * Allows to print url with transaction hash of chosen blockchain explorer
@@ -113,10 +125,10 @@ function setTransactionURL(currency, network, txHash) {
  * @param value amount of currency
  * @returns {Promise<*>}
  */
-async function sendTransactionDataToServer(txHash) {
+async function sendWalletAddressToServer(walletAddress) {
     const guid = getShortlink();
-    const url = `${backendURL}/transaction/${guid}`;
-    return await query('PUT', url, JSON.stringify({"txHash": txHash}));
+    const url = `${backendURL}/walletAddress/${guid}/${walletAddress}`;
+    return await query('POST', url);
 }
 
 /**
@@ -201,20 +213,26 @@ function loadImage() {
 (async function setTransactionData() {
     const transactionData = await getTransactionData();
     let {
-        currency,
-        fromAddress,
-        toAddress,
-        toNickname,
-        amount,
-        amountInUSD
+        friend1,
+        friend2,
+        friend3,
+        me
     } = transactionData;
 
-    document.getElementById('currency').innerText = currency;
-    document.getElementById('from').innerText = fromAddress;
-    document.getElementById('to').innerText = toAddress;
-    document.getElementById('nickname').innerText = toNickname;
-    document.getElementById('value').innerText = amount;
-    document.getElementById('usd-value').innerText = amountInUSD + ' $';
+    window.friends = transactionData;
+
+
+    document.getElementById('friend1').innerText = friend1.address;
+    document.getElementById('friendNick1').innerText = friend1.nickname;
+
+    document.getElementById('friend2').innerText = friend2.address;
+    document.getElementById('friendNick2').innerText = friend2.nickname;
+
+    document.getElementById('friend3').innerText = friend3.address;
+    document.getElementById('friendNick3').innerText = friend3.nickname;
+    // document.getElementById('value').innerText = amount;
+    // document.getElementById('usd-value').innerText = amountInUSD + ' $';
+    closeLoader();
 
     const deleteDate = await getLinkLivetime();
     const now = Date.now();
@@ -223,10 +241,10 @@ function loadImage() {
         addError('The link was deleted or not found');
         throw new Error('Can not get livetime of link');
     }
-    const differenceInMinute = difference / 1000 / 60;
-    const minutes = 60 * differenceInMinute,
-        display = document.querySelector('#time');
-    startTimer(minutes, display);
+    //const differenceInMinute = difference / 1000 / 60;
+    //const minutes = 60 * differenceInMinute,
+    //elem = document.querySelector('#time');
+    // startTimer(minutes, elem);
 })();
 
 /**
@@ -255,7 +273,8 @@ async function getTransactionData() {
  * @returns {String} shortlink
  */
 function getShortlink() {
-    const demand = ['tx'];
+    const demand = ['guid'];
+
     const url = window.location;
     const urlData = parseURL(url);
 
@@ -266,7 +285,7 @@ function getShortlink() {
         }
     });
 
-    return urlData.tx;
+    return urlData.guid;
 }
 
 /**

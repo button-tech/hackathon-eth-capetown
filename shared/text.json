@@ -62,8 +62,12 @@
         "button": "Help",
         "callback": "/sign-restore/?guid="
       },
-      "err": {
-        "notThreeFriends": "Sorry, but you can add only 3 friends",
+      "3": {
+        "button": "Create new account",
+        "callback": "/create-new-restore/?guid="
+      },
+      "err":{
+        "notThreeFriends":"Sorry, but you can add only 3 friends",
         "notReg": "This friend not register in bot"
       }
     }
