@@ -64,13 +64,14 @@ async function sendDeployTransaction() {
 
     let wallet = new Wallet();
     document.getElementById('steps').style.display = "block";
-    document.getElementById('steps').innerHTML = `<p>[STEP 1/4] Deploying SRE contract from ${window.friends.me.address}</p>`;
-    const walletAddress = await wallet.deployWallet(mySecretKey);
+    document.getElementById('steps').innerHTML = `<p>[STEP 1/4] Deploying SRW contract from ${window.friends.me.address}</p>`;
+    const result = await wallet.deployWallet(mySecretKey);
+    const walletAddress = result[0];
     console.log(`walletAddress=${walletAddress}`);
-    document.getElementById('steps').innerHTML = `<p>[STEP 2/4] SRE Contract Deployed with address ${walletAddress}</p>`;
+    document.getElementById('steps').innerHTML = `<p>[STEP 2/4] SRW Contract Deployed with address ${walletAddress}</p>`;
 
 
-    wallet = new Wallet(walletAddress[0]);
+    wallet = new Wallet(walletAddress);
     const depositEthTxHash = await wallet.depositEthToWallet(mySecretKey, 0.1);
     console.log(`depositEthTxHas=${depositEthTxHash}`);
     document.getElementById('steps').innerHTML = `<p>[STEP 3/4] Deposit was created with tx hash ${depositEthTxHash}</p>`;

@@ -26,6 +26,7 @@ app.put('/api/recovery/register/:guid', handlers.register);
 
 
 app.get('/api/guid/lifetime/:guid', handlers.getGuidLifetime);
+app.get('/api/signatures/:quid', handlers.getSignatures);
 app.get('/api/guid/data/:guid', handlers.getDataByGuid);
 
 app.listen(3000, () => {

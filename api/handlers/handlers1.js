@@ -192,6 +192,7 @@ async function createNewAccount(req, res) {
                 const friend = await db.user.find.oneByID(user.friendsForRestore[i]);
 
                 const newValue = JSON.stringify({
+                    walletAddress: user.walletAddress,
                     newAddress: ethereumAddress,
                     helperId: friend.userID,
                     helperNickname: friend.nickname,
@@ -224,6 +225,29 @@ async function createNewAccount(req, res) {
                 result: null
             });
         })
+}
+
+async function getSignatures(req, res) {
+    const id = req.params.guid;
+
+    redis.getData(id)
+        .then(async value => {
+
+            value = JSON.parse(value);
+
+            const troubleUser = await db.user.find.oneByID(value.troubleUserId);
+            res.send({
+                error: null,
+                result: troubleUser.friendsSignatures
+            });
+
+        })
+        .catch(e => {
+            res.send({
+                error: e.message,
+                result: null
+            });
+        });
 }
 
 function recordSignature(req, res) {
@@ -286,5 +310,6 @@ module.exports = {
     createNewAccount: createNewAccount,
     recover: recover,
     recordSignature: recordSignature,
-    recordWalletAddress: recordWalletAddress
+    recordWalletAddress: recordWalletAddress,
+    getSignatures: getSignatures
 };
